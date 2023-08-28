@@ -20,12 +20,22 @@ utilize breakpoints to bugfix efficiently in a project with a very large amount 
 they can best accomodate change down the road. After this co-op semester I recieved a part-time offer to continue with the company during my class semesters.
 
 # **Contact Information**
-Name: Trevor Darst
-Email: trevordarst@gmail.com, darsttd@mail.uc.edu
+Name: Trevor Darst |
+Email: trevordarst@gmail.com, darsttd@mail.uc.edu |
 Phone: 440-785-4177
 
 # **Co-op Work Experience**
 > **Honeywell Intelligrated | Software/Controls Engineer | 4/2021 - 11/2022**
 > - Wrote efficient and well-documented code in Studio5000
 > - Solved physical device issues with conveyor systems on job sites
-> - 
+> - Maintained excellent communication with engineering teams from very diverse cultural backgrounds
+> - Received full-time offer upon completion of three co-op terms
+
+> **NLign Analytics | Software Engineer | 4/2023 - Current**
+> - Created internal tool using Python and Batch file to help speed up efficiency of personnel data and project tracking for Director of Operations
+> - Translated legacy TestComplete scripts from JScript to Python and improved their documentation and functionality, increasing transparency of testing for developers
+> - Maintained excellent communication with engineering teams in a mostly remote position
+> - Developed adaptability in a project that had requirements changing on a weekly basis
+
+**Project Sought**
+I'm seeking a project that will help improve my skills and competency with full-stack software development
