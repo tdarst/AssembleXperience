@@ -7,3 +7,6 @@ Trevor Darst (Me) - darsttd@mail.uc.edu
 
 # **Project Topic Area**
 CPU Emulation
+
+# **Faculty Advisor**
+Prof. John Gallagher
