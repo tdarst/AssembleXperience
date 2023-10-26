@@ -93,17 +93,16 @@ def pass1(codeToParse):
 
         elif '.ORIG' in line:
             address_counter = int(line[1], 16)
-            print(address_counter)
-            print(type(address_counter))
 
         for token in line:
             if ';' in token: break # if there is a comment.
 
             else:
-                incrementAddressCounter(address_counter)
-                if token not in overall_dictionary and '#' not in token and '0x' not in token:
+                #incrementAddressCounter(address_counter)
+                if token and token not in overall_dictionary and '#' not in token and '0x' not in token:
                     symbol_table[token] = hex(address_counter)
 
+        address_counter += 1
     return symbol_table
 
 def pass2():
