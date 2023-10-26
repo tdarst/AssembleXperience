@@ -1,10 +1,11 @@
 .ORIG 0x3000
 LD R0, NUM1
 LD R1, NUM2
-ADD R2, R0, R1
+ADD R2, R0, R1 ;add the two numbers together
 ST R2, RESULT
 HALT
 
+;assigning values
 NUM1 .FILL #5
 NUM2 .FILL #2
 RESULT .BLKW #1

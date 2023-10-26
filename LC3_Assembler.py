@@ -62,19 +62,14 @@ PSEUDOS = {
     '.STRINGZ': None
 } #.ORIG, .END, etc.
 
-def incrementAddressCounter(addressCounter):
-    addressCounter += 1
-
+def checkIfValidSymbol(token):
+    if '#' in token or '0x' in token:
+        return False
+    return True
 def pass1(codeToParse):
-    # =======================================================
-    # pass1 parses the assembly code to create a symbol table
-    # =======================================================
-    # symbol_table = {} what exactly is going in here?
-    # Thinking Symbol Table:
-    # Symbol | Address | Value
-    #   X       0xY       Z
-    # for line in codeToParse.splitlines():
-    # 
+
+    address_counter = 0x0
+    symbol_table = {} # Will be a dictionary of namedtuples
 
     overall_dictionary = {
         **REGISTERS,
@@ -82,29 +77,24 @@ def pass1(codeToParse):
         **PSEUDOS
     }
 
-    address_counter = 0x0
-
-    symbol_table = {} # Will be a dictionary of namedtuples
-
-    for Line in codeToParse.splitlines():
+    # Get rid of any lines that are only comments or are blank
+    strippedCode =[x for x in codeToParse.splitlines() if x and not x.startswith(';')]
+    for Line in strippedCode:
         line = [x.replace(',','') for x in Line.split(' ')]
 
         if '.END' in line: break
-
         elif '.ORIG' in line:
             address_counter = int(line[1], 16)
 
         for token in line:
             if ';' in token: break # if there is a comment.
 
-            else:
-                #incrementAddressCounter(address_counter)
-                if token and token not in overall_dictionary and '#' not in token and '0x' not in token and token not in symbol_table:
+            elif token not in {**overall_dictionary, **symbol_table} \
+                and checkIfValidSymbol(token):
                     symbol_table[token] = hex(address_counter)
 
-        if Line and not Line.startswith(';'):
-            address_counter += 1
-        print(Line, address_counter)
+        address_counter += 1
+
     return symbol_table
 
 def pass2():
@@ -113,7 +103,6 @@ def pass2():
 def main():
     f = open('Assembly_Test.txt', 'r')
     readLines = f.read()
-
     print(pass1(readLines))
 
 main()
