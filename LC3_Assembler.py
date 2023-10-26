@@ -99,10 +99,12 @@ def pass1(codeToParse):
 
             else:
                 #incrementAddressCounter(address_counter)
-                if token and token not in overall_dictionary and '#' not in token and '0x' not in token:
+                if token and token not in overall_dictionary and '#' not in token and '0x' not in token and token not in symbol_table:
                     symbol_table[token] = hex(address_counter)
 
-        address_counter += 1
+        if Line and not Line.startswith(';'):
+            address_counter += 1
+        print(Line, address_counter)
     return symbol_table
 
 def pass2():
