@@ -66,6 +66,17 @@ def checkIfValidSymbol(token):
     if '#' in token or '0x' in token:
         return False
     return True
+
+def shaveLine(Line):
+    Line = Line.replace(' ', '') # Removes spaces
+    Line = Line.replace('\t','') # Removes tabs
+    return Line
+
+def convertToHex(token):
+    if not token.startswith('0'):
+        return '0'+token
+    return token
+
 def pass1(codeToParse):
 
     address_counter = 0x0
@@ -80,11 +91,11 @@ def pass1(codeToParse):
     # Get rid of any lines that are only comments or are blank
     strippedCode =[x for x in codeToParse.splitlines() if x and not x.startswith(';')]
     for Line in strippedCode:
+        Line = shaveLine(Line)
         line = [x.replace(',','') for x in Line.split(' ')]
-
         if '.END' in line: break
         elif '.ORIG' in line:
-            address_counter = int(line[1], 16)
+            address_counter = int(convertToHex(line[1]), 16)
 
         for token in line:
             if ';' in token: break # if there is a comment.
@@ -101,7 +112,7 @@ def pass2():
     pass
 
 def main():
-    f = open('Assembly_Test.txt', 'r')
+    f = open('2048.asm', 'r')
     readLines = f.read()
     print(pass1(readLines))
 
