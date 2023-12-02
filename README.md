@@ -1,6 +1,6 @@
 # Fall Design Report Table of Contents
 [Team name and Project Abstract]1. Team Name and Project Abstract
-[Project Description](/Project_Planning_And_Assignments/Project_Description)2. Project Description
+[Project Description](/Project_Planning_And_Assignments/Project_Description.md)2. Project Description
 3. User Stories and Design Diagrams
 	- User Stories
 	- Design Diagrams: Level 0, Level 1, Level 2
