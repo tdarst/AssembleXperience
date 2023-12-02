@@ -1,5 +1,6 @@
 # Fall Design Report Table of Contents
-[Team name and Project Abstract](https://mailuc-my.sharepoint.com/:w:/r/personal/darsttd_mail_uc_edu/Documents/Assignment%204.docx?d=wb8f9b5bf897d4ae0b550772b50830f78&csf=1&web=1&e=YuLGG3)1. Team Name and Project Abstract
+[Team name and Project Abstract](https://mailuc-my.sharepoint.com/:w:/r/personal/darsttd_mail_uc_edu/Documents/Assignment%204.docx?d=wb8f9b5bf897d4ae0b550772b50830f78&csf=1&web=1&e=YuLGG3)
+1. Team Name and Project Abstract
 [Link](/Project_Planning_And_Assignments/Project_Description.md)2. Project Description
 3. User Stories and Design Diagrams
 	- User Stories
