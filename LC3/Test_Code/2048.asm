@@ -1,25 +1,3 @@
-;--------------------------------------------------------------------------
-;
-; Program: 2048.asm
-; Final Project
-; Name: Ryan Pendleton
-; Class: CS2810
-; Date: 5 Dec 2014
-; Version: 1.0
-;
-; Ethics: I declare that the following source code was written
-; solely by me. I understand that copying any source
-; code, in whole or in part, constitutes cheating,
-; and that I will receive a zero grade on this
-; project if I am found in violation of this ethic.
-;
-; X Ryan Pendleton
-;
-; Description: An implementation of git.io/2048 created using LC-3.
-; License can be found in the accompanying LICENSE file.
-;
-;--------------------------------------------------------------------------
-
 .ORIG x3000
 
 ;--------------------------------------------------------------------------

@@ -67,17 +67,12 @@ def checkIfValidSymbol(token):
         return False
     return True
 
-def shaveLine(Line):
-    Line = Line.replace(' ', '') # Removes spaces
-    Line = Line.replace('\t','') # Removes tabs
-    return Line
-
 def convertToHex(token):
     if not token.startswith('0'):
         return '0'+token
     return token
 
-def pass1(codeToParse):
+def pass1(code_to_parse):
 
     address_counter = 0x0
     symbol_table = {} # Will be a dictionary of namedtuples
@@ -89,22 +84,15 @@ def pass1(codeToParse):
     }
 
     # Get rid of any lines that are only comments or are blank
-    strippedCode =[x for x in codeToParse.splitlines() if x and not x.startswith(';')]
-    for Line in strippedCode:
-        Line = shaveLine(Line)
-        line = [x.replace(',','') for x in Line.split(' ')]
-        if '.END' in line: break
-        elif '.ORIG' in line:
-            address_counter = int(convertToHex(line[1]), 16)
+    strippedCode =[x for x in code_to_parse.splitlines() if x and not x.startswith(';')]
+    for line in code_to_parse.replace("\t", " ").split("\n"):
+        line = line.split(";")[0].strip()
 
-        for token in line:
-            if ';' in token: break # if there is a comment.
+        if not line:
+            continue
 
-            elif token not in {**overall_dictionary, **symbol_table} \
-                and checkIfValidSymbol(token):
-                    symbol_table[token] = hex(address_counter)
-
-        address_counter += 1
+        label = line.rstrip(":")
+        symbol_table[label] = address_counter if ':' in line else address_counter + 1
 
     return symbol_table
 
@@ -112,7 +100,7 @@ def pass2():
     pass
 
 def main():
-    f = open('2048.asm', 'r')
+    f = open(r'Test_Code\2048.asm', 'r')
     readLines = f.read()
     print(pass1(readLines))
 
