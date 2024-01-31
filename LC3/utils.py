@@ -88,10 +88,10 @@ def hex_to_int(hex_str: str) -> int:
 def is_register(tok: str) -> bool:
     return tok in REGISTERS
 
+#TODO: FIX THIS RETURN
 def is_imm5(tok: str) -> bool:
-    return tok.startswith('#') and type(tok.replace('#','')) is int
+    return tok.startswith('#')
     
-
 def is_label(tok: str, label_lookup: dict) -> bool:
     tok_is_label = tok in label_lookup
     return tok_is_label

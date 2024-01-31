@@ -27,8 +27,8 @@ def parse_add(address: str, tokens: dict, label_lookup: dict) -> str:
 
     elif utils.is_imm5(OP3):
         int_OP3 = utils.imm5_to_int(OP3)
-        bin_OP3 = utils.int_to_bin(int_OP3).zfill(z_left)
-        bin_string += bin_OP3
+        bin_OP3 = utils.int_to_bin(int_OP3)
+        bin_string += bin_OP3.zfill(z_left)
 
     elif utils.is_label(OP3, label_lookup):
         label_address = label_lookup[OP3]
@@ -75,7 +75,12 @@ def parse_explicit_trap(trap_vector: int) -> str:
 
 def parse_orig(tokens: dict) -> str: pass
 
-def parse_fill(tokens: dict) -> str: pass
+def parse_fill(address: str, tokens: dict, label_lookup: dict) -> str:
+    # TODO: ADD VALIDATION
+    operands = tokens[KEY_OPERANDS]
+    imm5_val = operands[0]
+    bin_val = utils.int_to_bin(utils.imm5_to_int(imm5_val))
+    return bin_val.zfill(MAX_LINE_LENGTH)
 
 def parse_blkw(tokens: dict) -> str: pass
 

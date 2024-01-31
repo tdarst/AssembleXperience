@@ -1,5 +1,6 @@
 import parselib
 import utils
+import types
 
 KEY_OPCODE = utils.KEY_OPCODE
 KEY_OPERANDS = utils.KEY_OPERANDS
@@ -43,7 +44,18 @@ PARSE_DICT = {
     '.FILL': parselib.parse_fill,
     '.BLKW': parselib.parse_blkw,
     '.STRINGZ': parselib.parse_stringz
-}       
+}
+
+def createTokenObject(tok: str) -> object:
+    int_value = utils.overall_dictionary[tok]
+    hex_value = hex(int_value)
+    bin_value = utils.int_to_bin(int_value)
+    obj = types.SimpleNamespace(
+        token = tok,
+        int_val = int_value,
+        hex_val = hex_value,
+        bin_val = bin_value
+    )
 
 def pass1(code_to_parse: str) -> dict:
 
