@@ -1,107 +1,158 @@
-import os
-from collections import namedtuple
+import parselib
+import utils
 
-# ====================
-# Vector Dictionaries
-# =====================
-REGISTERS = {
-    'R0':0x0,
-    'R1':0x1,
-    'R2':0x2,
-    'R3':0x3,
-    'R4':0x4,
-    'R5':0x5,
-    'R6':0x6,
-    'R7':0x7
-}
+KEY_OPCODE = utils.KEY_OPCODE
+KEY_OPERANDS = utils.KEY_OPERANDS
+KEY_LABELS = utils.KEY_LABELS
 
-TRAPS = {
-    'GETC': 0x20,
-    'OUT' : 0x21,
-    'PUTS': 0x22,
-    'IN'  : 0x23,
-    'HALT': 0x25
-} #PUTS, GETC, etc. 
+PARSE_DICT = {
+    'BR'   : parselib.parse_br,
+    'BRn'  : parselib.parse_br,
+    'BRz'  : parselib.parse_br,
+    'BRp'  : parselib.parse_br,
+    'BRnz' : parselib.parse_br,
+    'BRnp' : parselib.parse_br,
+    'BRzp' : parselib.parse_br,
+    'BRnzp': parselib.parse_br,
 
-OPCODE = {
-    'BR'   : 0x0,
-    'BRn'  : 0x0,
-    'BRz'  : 0x0,
-    'BRp'  : 0x0,
-    'BRnz' : 0x0,
-    'BRnp' : 0x0,
-    'BRzp' : 0x0,
-    'BRnzp': 0x0,
+    'ADD' : parselib.parse_add,
+    'LD'  : parselib.parse_ld,
+    'ST'  : parselib.parse_st,
+    'JSR' : parselib.parse_jsr,
+    'JSRR': parselib.parse_jsrr,
+    'AND' : parselib.parse_and,
+    'LDR' : parselib.parse_ldr,
+    'STR' : parselib.parse_str,
+    'RTI' : parselib.parse_rti,
+    'NOT' : parselib.parse_not,
+    'LDI' : parselib.parse_ldi,
+    'STI' : parselib.parse_sti,
+    'JMP' : parselib.parse_jmp,
+    'RET' : parselib.parse_ret,
+    'LEA' : parselib.parse_lea,
 
-    'ADD' : 0x1,
-    'LD'  : 0x2,
-    'ST'  : 0x3,
-    'JSR' : 0x4,
-    'JSRR': 0x4,
-    'AND' : 0x5,
-    'LDR' : 0x6,
-    'STR' : 0X7,
-    'RTI' : 0X8,
-    'NOT' : 0x9,
-    'LDI' : 0xA,
-    'STI' : 0xB,
-    'JMP' : 0xC,
-    'RET' : 0xC,
-    'RES' : 0xD,
-    'LEA' : 0xE,
-    'TRAP': 0xF,
+    'TRAP': parselib.parse_trap,
+    'GETC': parselib.parse_explicit_trap,
+    'OUT' : parselib.parse_explicit_trap,
+    'PUTS': parselib.parse_explicit_trap,
+    'IN'  : parselib.parse_explicit_trap,
+    'HALT': parselib.parse_explicit_trap,
 
-    **TRAPS # includes the TRAPS dictionary
-}
+    '.ORIG': parselib.parse_orig,
+    '.END' : parselib.parse_end,
+    '.FILL': parselib.parse_fill,
+    '.BLKW': parselib.parse_blkw,
+    '.STRINGZ': parselib.parse_stringz
+}       
 
-PSEUDOS = {
-    '.ORIG'   : None,
-    '.END'    : None,
-    '.FILL'   : None,
-    '.BLKW'   : None,
-    '.STRINGZ': None
-} #.ORIG, .END, etc.
+def pass1(code_to_parse: str) -> dict:
 
-def checkIfValidSymbol(token):
-    if '#' in token or '0x' in token:
-        return False
-    return True
-
-def convertToHex(token):
-    if not token.startswith('0'):
-        return '0'+token
-    return token
-
-def pass1(code_to_parse):
-
+    # Program Counter defaults to starting at 0
     address_counter = 0x0
-    symbol_table = {} # Will be a dictionary of namedtuples
 
-    overall_dictionary = {
-        **REGISTERS,
-        **OPCODE,
-        **PSEUDOS
+    symbol_table = {
+        # address : {opcode : opcode,
+        #            operands : [operand1, operand2, etc] 
+        #            unresolved: [var1, label1]}
     }
 
-    # Get rid of any lines that are only comments or are blank
-    strippedCode =[x for x in code_to_parse.splitlines() if x and not x.startswith(';')]
+    label_lookup = {}
+
+    solo_label = None
+    
+    # Gets rid of tabs and newlines
     for line in code_to_parse.replace("\t", " ").split("\n"):
+        
+        # Gets rid of comments
         line = line.split(";")[0].strip()
 
+        # Get parts of line as a list of tokens
+        tokens = line.replace(',','').split(' ')
+
+        # If line is blank
         if not line:
             continue
 
-        label = line.rstrip(":")
-        symbol_table[label] = address_counter if ':' in line else address_counter + 1
+        # Start address counter at .ORIG
+        elif '.ORIG' in line:
+            # add .ORIG to symbol table
+            address_counter = int(line.split(' ')[1], 16)
 
-    return symbol_table
+        # If .END is reached then break
+        elif '.END' in line:
+            break
 
-def pass2():
-    pass
+        # If label is solo
+        elif tokens[0] is tokens[-1] \
+            and tokens[0] not in utils.overall_dictionary:
+            solo_label = tokens[0]
+
+        # Any other line
+        else:
+            # Get parts of line as a list of tokens
+            tokens = line.replace(',','').split(' ')
+
+            # If there is a solo label in the last line, add it to the current
+            if solo_label:
+                tokens.insert(0, solo_label)
+                solo_label = None
+
+            # Find the opcode, save it's name and it's index so it can be used as a dividing line for parsing
+            find_opcode = next(((token, tokens.index(token)) for token in tokens if token in utils.opcode_dictionary))
+            opcode = find_opcode[0]
+            opcode_index = find_opcode[1]
+
+            # Operands are all tokens occurring after the opcode,
+            # Labels are all tokens occurring before the opcode
+            operands = [token for token in tokens[opcode_index+1:]]
+            labels   = [token for token in tokens[:opcode_index]]
+
+            # Create a key value pair of the hex'd address and the tokens in the line.
+            address = hex(address_counter)
+            symbol_table[address] = {
+                KEY_OPCODE : opcode,
+                KEY_OPERANDS : operands,
+                KEY_LABELS : labels
+            }
+
+            if labels:
+                for label in labels:
+                    label_lookup.update({label : address})
+            
+            # Increment the address_counter
+            address_counter += 0x1
+
+    return symbol_table, label_lookup
+
+def pass2(symbol_table, label_lookup):
+    machine_code = ''
+    for address, tokens in symbol_table.items():
+        opcode = tokens[KEY_OPCODE]
+        bin_string = parselib.PARSE_DICT[opcode](address, tokens, label_lookup)
+        machine_code += f"{bin_string}\n"
+
+    return machine_code.rstrip('\n')
 
 def main():
-    f = open(r'Test_Code\2048.asm', 'r')
-    readLines = f.read()
-    print(pass1(readLines))
+    addTest = r'LC3\Test_Code\add_test.txt'
+    debugString = r'LC3\Test_Code\Assembly_Test.txt'
+    debugString2 = r"LC3\Test_Code\2048.asm"
+
+    path = addTest
+
+    def runBothPasses():
+        with open(path, 'r') as file:
+            readLines = file.read()
+            return pass2(pass1(readLines))
+
+    def runPass1():
+        with open(path, 'r') as file:
+            readLines = file.read()
+            return pass1(readLines) 
+
+    symbol_table, label_lookup = runPass1()
+    print(pass2(symbol_table, label_lookup))
+    
+    #unitTest_Assembly_Test(runBothPasses())
 
 main()

@@ -1,0 +1,4 @@
+ADD R1, R1, R2
+ADD R1, R1, #1
+ADD R1, R1, NUM
+NUM .FILL #1

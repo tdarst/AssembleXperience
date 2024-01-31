@@ -1,4 +1,6 @@
-.ORIG x3000
+;This is not my code, this code was taken just to test my assembler. - Trevor Darst
+
+.ORIG 0x3000
 
 ;--------------------------------------------------------------------------
 ; MAIN
