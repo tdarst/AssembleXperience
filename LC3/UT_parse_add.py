@@ -19,7 +19,7 @@ class TestParseAdd(unittest.TestCase):
                                                                         test_vars.TOK_R2], 
                                                               labels=[])
         
-        self.assertTrue(parselib.parse_add(address, tokens, []), '0101001001000010')
+        self.assertEquals(parselib.parse_add(address, tokens, []), '0101001001000010')
 
     # Test
     # ADD, R1, R1, #1
@@ -32,7 +32,7 @@ class TestParseAdd(unittest.TestCase):
                                                                   test_vars.TOK_IMM5_1],
                                                         labels=[])
         
-        self.assertTrue(parselib.parse_add(address, tokens, []), '0101001010100001')
+        self.assertEquals(parselib.parse_add(address, tokens, []), '0101001010100001')
 
 
         

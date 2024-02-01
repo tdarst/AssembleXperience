@@ -21,7 +21,7 @@ class TestParseBr(unittest.TestCase):
         label_lookup = test_vars.generate_tester_label_lookup(label=test_vars.TOK_LABEL_LOOP,
                                                               address=test_vars.ADDRESS_0X3001)
         
-        self.assertTrue(parselib.parse_br(address, tokens, label_lookup), '0000111000000000')
+        self.assertEquals(parselib.parse_br(address, tokens, label_lookup), '0000111000000000')
 
     # Test
     # x3000 LOOP
@@ -36,7 +36,7 @@ class TestParseBr(unittest.TestCase):
         label_lookup = test_vars.generate_tester_label_lookup(label=test_vars.TOK_LABEL_LOOP,
                                                               address=test_vars.ADDRESS_0X3000)
         
-        self.assertTrue(parselib.parse_br(address, tokens, label_lookup), '0101001001100001')
+        self.assertEquals(parselib.parse_br(address, tokens, label_lookup), '0101001001100001')
 
     # Test
     # x3000 BRn LOOP
@@ -51,7 +51,7 @@ class TestParseBr(unittest.TestCase):
         label_lookup = test_vars.generate_tester_label_lookup(label=test_vars.TOK_LABEL_LOOP,
                                                               address=test_vars.ADDRESS_0X3001)
         
-        self.assertTrue(parselib.parse_br(address, tokens, label_lookup), '0000100000000000')
+        self.assertEquals(parselib.parse_br(address, tokens, label_lookup), '0000100000000000')
 
     # Test
     # x3000 BRnp LOOP
@@ -66,7 +66,7 @@ class TestParseBr(unittest.TestCase):
         label_lookup = test_vars.generate_tester_label_lookup(label=test_vars.TOK_LABEL_LOOP,
                                                               address=test_vars.ADDRESS_0X3001)
         
-        self.assertTrue(parselib.parse_br(address, tokens, label_lookup), '0000101000000000')
+        self.assertEquals(parselib.parse_br(address, tokens, label_lookup), '0000101000000000')
 
     # Test
     # x3000 BRnz LOOP
@@ -81,7 +81,7 @@ class TestParseBr(unittest.TestCase):
         label_lookup = test_vars.generate_tester_label_lookup(label=test_vars.TOK_LABEL_LOOP,
                                                               address=test_vars.ADDRESS_0X3001)
         
-        self.assertTrue(parselib.parse_br(address, tokens, label_lookup), '0000110000000000')
+        self.assertEquals(parselib.parse_br(address, tokens, label_lookup), '0000110000000000')
 
     # Test
     # x3000 BRnzp LOOP
@@ -96,7 +96,7 @@ class TestParseBr(unittest.TestCase):
         label_lookup = test_vars.generate_tester_label_lookup(label=test_vars.TOK_LABEL_LOOP,
                                                               address=test_vars.ADDRESS_0X3001)
         
-        self.assertTrue(parselib.parse_br(address, tokens, label_lookup), '0000111000000000')
+        self.assertEquals(parselib.parse_br(address, tokens, label_lookup), '0000111000000000')
 
     # Test
     # x3000 BRz LOOP
@@ -111,7 +111,7 @@ class TestParseBr(unittest.TestCase):
         label_lookup = test_vars.generate_tester_label_lookup(label=test_vars.TOK_LABEL_LOOP,
                                                               address=test_vars.ADDRESS_0X3001)
         
-        self.assertTrue(parselib.parse_br(address, tokens, label_lookup), '0000010000000000')
+        self.assertEquals(parselib.parse_br(address, tokens, label_lookup), '0000010000000000')
 
     # Test
     # x3000 BRzp LOOP
@@ -126,7 +126,7 @@ class TestParseBr(unittest.TestCase):
         label_lookup = test_vars.generate_tester_label_lookup(label=test_vars.TOK_LABEL_LOOP,
                                                               address=test_vars.ADDRESS_0X3001)
         
-        self.assertTrue(parselib.parse_br(address, tokens, label_lookup), '0000011000000000')
+        self.assertEquals(parselib.parse_br(address, tokens, label_lookup), '0000011000000000')
 
     # Test
     # x3000 BRp LOOP
@@ -141,4 +141,4 @@ class TestParseBr(unittest.TestCase):
         label_lookup = test_vars.generate_tester_label_lookup(label=test_vars.TOK_LABEL_LOOP,
                                                               address=test_vars.ADDRESS_0X3001)
         
-        self.assertTrue(parselib.parse_br(address, tokens, label_lookup), '0000001000000000')
+        self.assertEquals(parselib.parse_br(address, tokens, label_lookup), '0000001000000000')

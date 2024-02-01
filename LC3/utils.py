@@ -88,6 +88,9 @@ def imm5_to_bin(imm_str: str) -> str:
 def hex_to_int(hex_str: str) -> int:
     return int(hex_str, 16)
 
+def hex_to_bin(hex_str: str) -> str:
+    return int_to_bin(hex_to_int(hex_str))
+
 def is_register(tok: str) -> bool:
     return tok in REGISTERS
 
@@ -99,7 +102,7 @@ def is_label(tok: str, label_lookup: dict) -> bool:
     tok_is_label = tok in label_lookup
     return tok_is_label
 
-def is_offset6(tok: str) -> bool: pass     
+def is_offset6(tok: str) -> bool: pass
 
 # Takes positive binary string and returns it's two's complement
 def calc_twos_complement(bin_string: str):

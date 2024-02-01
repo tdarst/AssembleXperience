@@ -30,6 +30,10 @@ class TestVars():
         self.TOK_JMP = 'JMP'
         self.TOK_JSR = 'JSR'
         self.TOK_JSRR = 'JSRR'
+        self.TOK_LD = 'LD'
+        self.TOK_LDI = 'LDI'
+        self.TOK_LDR = 'LDR'
+        
 
         self.TESTER_LABEL_LOOKUP = {}
 

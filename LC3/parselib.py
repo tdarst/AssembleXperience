@@ -43,6 +43,22 @@ def parse_jmp_or_jsrr(address: str, tokens: dict, label_lookup: dict) -> str:
 
     return bin_string
 
+def parse_ld_or_ldi(address: str, tokens: dict, label_lookup: dict) -> str:
+    opcode = tokens[KEY_OPCODE]
+    operands = tokens[KEY_OPERANDS]
+    dest_reg = operands[0]
+    label = operands[1]
+    label_address = label_lookup[label]
+    current_address = address
+
+    bin_opcode = utils.int_to_bin(utils.OPCODE[opcode]).zfill(OPCODE_LENGTH)
+    bin_dest_reg = utils.int_to_bin(utils.REGISTERS[dest_reg]).zfill(REGISTER_LENGTH)
+    offset9_string = utils.calc_offset11(label_address, current_address)
+
+    bin_string = bin_opcode + bin_dest_reg + offset9_string
+
+    return bin_string
+
 def parse_add(address: str, tokens: dict, label_lookup: dict) -> str:
     return parse_add_or_and(address, tokens, label_lookup)
 
@@ -83,11 +99,32 @@ def parse_jsr(address: str, tokens: dict, label_lookup: dict) -> str:
 def parse_jsrr(address: str, tokens: dict, label_lookup: dict) -> str:
     return parse_jmp_or_jsrr(address, tokens, label_lookup)
 
-def parse_ld(tokens: dict, label_lookup: dict) -> str: pass
+def parse_ld(address: str, tokens: dict, label_lookup: dict) -> str:
+    return parse_ld_or_ldi(address, tokens, label_lookup)
 
-def parse_ldi(tokens: dict, label_lookup: dict) -> str: pass
+def parse_ldi(address: str, tokens: dict, label_lookup: dict) -> str:
+    return parse_ld_or_ldi(address, tokens, label_lookup)
 
-def parse_ldr(tokens: dict) -> str: pass
+def parse_ldr(tokens: dict) -> str:
+    opcode = tokens[KEY_OPCODE]
+    operands = tokens[KEY_OPERANDS]
+    OP1, OP2, OP3 = operands[0], operands[1], operands[2]
+    bin_opcode = utils.int_to_bin(utils.OPCODE[opcode]).zfill(OPCODE_LENGTH)
+    bin_OP1 = utils.int_to_bin(utils.REGISTERS[OP1]).zfill(REGISTER_LENGTH)
+    bin_OP2 = utils.int_to_bin(utils.REGISTERS[OP2]).zfill(REGISTER_LENGTH)
+
+    bin_string = bin_opcode + bin_OP1 + bin_OP2
+
+    if utils.is_imm5(OP3):
+        bin_OP3 = utils.imm5_to_bin(OP3).zfill(6)
+        bin_string += bin_OP3
+
+    else:
+        bin_OP3 = utils.hex_to_bin(OP3).zfill(6)
+        print(bin_OP3)
+        bin_string += bin_OP3
+
+    return bin_string
 
 def parse_lea(tokens: dict, label_lookup: dict) -> str: pass
 

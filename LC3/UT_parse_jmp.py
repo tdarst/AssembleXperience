@@ -17,4 +17,4 @@ class TestParseJmp(unittest.TestCase):
                                                         operands=[test_vars.TOK_R1], 
                                                         labels=[])
         
-        self.assertTrue(parselib.parse_jmp(address, tokens, []), '1100000001000000')
+        self.assertEquals(parselib.parse_jmp(address, tokens, []), '1100000001000000')
