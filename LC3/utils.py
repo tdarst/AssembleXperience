@@ -82,6 +82,9 @@ def int_to_bin(num: int) -> str:
 def imm5_to_int(imm_str: str) -> int:
     return int(imm_str.replace('#', ''))
 
+def imm5_to_bin(imm_str: str) -> str:
+    return int_to_bin(imm5_to_int(imm_str))
+
 def hex_to_int(hex_str: str) -> int:
     return int(hex_str, 16)
 
@@ -98,7 +101,34 @@ def is_label(tok: str, label_lookup: dict) -> bool:
 
 def is_offset6(tok: str) -> bool: pass     
 
-def calc_offset(label_address: str, current_address: str) -> str:
+# Takes positive binary string and returns it's two's complement
+def calc_twos_complement(bin_string: str):
+    inverted_bits = ''.join('1' if bit == '0' else '0' for bit in bin_string)
+    twos_complement = int_to_bin(int(inverted_bits, 2) + 1)
+    return twos_complement
+
+def calc_offset9(label_address: str, current_address: str) -> str:
     label_address = hex_to_int(label_address)
     current_address = hex_to_int(current_address)
-    return label_address - current_address - 1
+    int_offset = label_address - current_address - 1
+    if int_offset < 0:
+        offset9 = calc_twos_complement(int_to_bin(int_offset).zfill(9))
+    else:
+        offset9 = int_to_bin(int_offset).zfill(9)
+
+    return offset9
+
+def calc_offset11(label_address: str, current_address: str) -> str:
+    label_address = hex_to_int(label_address)
+    current_address = hex_to_int(current_address)
+    int_offset = label_address - current_address - 1
+    if int_offset < 0:
+        offset11 = calc_twos_complement(int_to_bin(int_offset).zfill(11))
+    else:
+        offset11 = int_to_bin(int_offset).zfill(11)
+
+    return offset11
+
+def get_nzp_bin_string(opcode: str) -> str:
+    nzp = [int('n' in opcode), int('z' in opcode), int('p' in opcode)]
+    return ''.join([str(item) for item in nzp])

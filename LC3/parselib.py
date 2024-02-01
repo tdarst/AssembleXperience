@@ -9,7 +9,7 @@ KEY_OPCODE = utils.KEY_OPCODE
 KEY_OPERANDS = utils.KEY_OPERANDS
 KEY_LABELS = utils.KEY_LABELS
 
-def parse_add(address: str, tokens: dict, label_lookup: dict) -> str:
+def parse_add_or_and(address: str, tokens: dict, label_lookup: dict) -> str:
     #TODO: ADD VALIDATION
     opcode = tokens[KEY_OPCODE]
     operands = tokens[KEY_OPERANDS]
@@ -19,34 +19,69 @@ def parse_add(address: str, tokens: dict, label_lookup: dict) -> str:
     bin_OP2 = utils.int_to_bin(utils.REGISTERS[OP2]).zfill(REGISTER_LENGTH)
 
     bin_string = bin_opcode + bin_OP1 + bin_OP2
-    z_left = MAX_LINE_LENGTH - len(bin_string)
 
     if utils.is_register(OP3):
-        OP3 = utils.int_to_bin(utils.REGISTERS[OP3]).zfill(z_left)
+        OP3 = utils.int_to_bin(utils.REGISTERS[OP3]).zfill(6)
         bin_string += OP3
 
     elif utils.is_imm5(OP3):
-        int_OP3 = utils.imm5_to_int(OP3)
-        bin_OP3 = utils.int_to_bin(int_OP3)
-        bin_string += bin_OP3.zfill(z_left)
-
-    elif utils.is_label(OP3, label_lookup):
-        label_address = label_lookup[OP3]
-        current_address = address
-        offset = utils.calc_offset(label_address, current_address)
-        bin_string += utils.int_to_bin(offset).zfill(z_left)
+        bin_OP3 = utils.imm5_to_bin(OP3)
+        bin_string += '1' + bin_OP3
 
     return bin_string
 
-def parse_and(address: str, tokens: dict, label_lookup: dict) -> str: pass
+def parse_jmp_or_jsrr(address: str, tokens: dict, label_lookup: dict) -> str:
+    opcode = tokens[KEY_OPCODE]
+    OP1 = tokens[KEY_OPERANDS][0]
 
-def parse_br(tokens: dict, label_lookup: dict) -> str: pass
+    bin_opcode = utils.int_to_bin(utils.OPCODE[opcode]).zfill(OPCODE_LENGTH)
+    fill_zeros3 = ''.zfill(3)
+    bin_reg = utils.int_to_bin(utils.REGISTERS[OP1]).zfill(REGISTER_LENGTH)
+    fill_zeros6 = ''.zfill(6)
 
-def parse_jmp(tokens: dict) -> str: pass
+    bin_string = bin_opcode + fill_zeros3 + bin_reg + fill_zeros6
 
-def parse_jsr(tokens: dict, label_lookup: dict) -> str: pass
+    return bin_string
 
-def parse_jsrr(tokens: dict) -> str: pass
+def parse_add(address: str, tokens: dict, label_lookup: dict) -> str:
+    return parse_add_or_and(address, tokens, label_lookup)
+
+def parse_and(address: str, tokens: dict, label_lookup: dict) -> str:
+    return parse_add_or_and(address, tokens, label_lookup)
+
+def parse_br(address: str, tokens: dict, label_lookup: dict) -> str:
+    opcode = tokens[KEY_OPCODE]
+    operands = tokens[KEY_OPERANDS]
+    label = operands[0]
+    current_address = address
+    label_address = label_lookup[label]
+
+    bin_opcode = utils.int_to_bin(utils.OPCODE[opcode]).zfill(OPCODE_LENGTH)
+    nzp_string = utils.get_nzp_bin_string(opcode)
+    offset9_string = utils.calc_offset9(label_address, current_address)
+
+    bin_string = bin_opcode + nzp_string + offset9_string
+    return bin_string
+
+def parse_jmp(address: str, tokens: dict, label_lookup: dict) -> str:
+    return parse_jmp_or_jsrr(address, tokens, label_lookup)
+    
+def parse_jsr(address: str, tokens: dict, label_lookup: dict) -> str:
+    opcode = tokens[KEY_OPCODE]
+    label = tokens[KEY_OPERANDS][0]
+    label_address = label_lookup[label]
+    current_address = address
+
+    bin_opcode = utils.int_to_bin(utils.OPCODE[opcode]).zfill(OPCODE_LENGTH)
+    fill_one = '1'
+    offset11_string = utils.calc_offset11(label_address, current_address)
+
+    bin_string = bin_opcode + fill_one + offset11_string
+
+    return bin_string
+
+def parse_jsrr(address: str, tokens: dict, label_lookup: dict) -> str:
+    return parse_jmp_or_jsrr(address, tokens, label_lookup)
 
 def parse_ld(tokens: dict, label_lookup: dict) -> str: pass
 
@@ -88,6 +123,8 @@ def parse_stringz(tokens: dict) -> str: pass
 
 def parse_end(tokens: dict) -> str:
     return utils.to_bin(0).zfill(MAX_LINE_LENGTH)
+
+
 
 PARSE_DICT = {
     'BR'   : parse_br,

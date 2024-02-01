@@ -1,14 +1,12 @@
-import unittest
-from . import UT_parse_add
+import utils
 
-KEY_OPCODE = 'opcode'
-KEY_OPERANDS = 'operands'
-KEY_LABELS = 'labels'
-
+KEY_OPCODE = utils.KEY_OPCODE
+KEY_OPERANDS = utils.KEY_OPERANDS
+KEY_LABELS = utils.KEY_LABELS
 class TestVars():
     def __init__(self):
-        self.ADDRESS_0X3010 = '0x3010'
-        self.ADDRESS_0X3000 = '0X3000'
+        self.ADDRESS_0X3001 = '0x3001'
+        self.ADDRESS_0X3000 = '0x3000'
         
         self.TOK_R1 = 'R1'
         self.TOK_R2 = 'R2'
@@ -20,6 +18,18 @@ class TestVars():
         self.TOK_LABEL_NUM = 'NUM'
 
         self.TOK_ADD = 'ADD'
+        self.TOK_AND  = 'AND'
+        self.TOK_BR = 'BR'
+        self.TOK_BRN = 'BRn'
+        self.TOK_BRZ = 'BRz'
+        self.TOK_BRP = 'BRp'
+        self.TOK_BRNZ = 'BRnz'
+        self.TOK_BRNP = 'BRnp'
+        self.TOK_BRZP = 'BRzp'
+        self.TOK_BRNZP = 'BRnzp'
+        self.TOK_JMP = 'JMP'
+        self.TOK_JSR = 'JSR'
+        self.TOK_JSRR = 'JSRR'
 
         self.TESTER_LABEL_LOOKUP = {}
 
@@ -34,16 +44,3 @@ class TestVars():
         new_label_lookup = {}
         new_label_lookup[label] = address
         return new_label_lookup
-
-def main():
-    # Create a TestLoader and discover all tests
-    loader = unittest.TestLoader()
-    suite = unittest.TestSuite()
-
-    print('YAY')
-
-    suite.addTests(loader.loadTestsFromTestCase(UT_parse_add.TestParseAdd))
-
-    # Run the tests using TextTestRunner
-    runner = unittest.TextTestRunner()
-    result = runner.run(suite)
