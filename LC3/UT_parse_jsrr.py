@@ -2,7 +2,7 @@ import unittest
 import Class_TestVars
 import parselib
 
-class TestParseJmp(unittest.TestCase):
+class TestParseJsrr(unittest.TestCase):
     
     def setUp(self):
         super().setUp()
@@ -17,4 +17,4 @@ class TestParseJmp(unittest.TestCase):
                                                         operands=[test_vars.TOK_R1], 
                                                         labels=[])
         
-        self.assertEquals(parselib.parse_jsrr(address, tokens, []), '0100000001000000')
+        self.assertEqual(parselib.parse_jsrr(address, tokens, []), '0100000001000000')

@@ -2,7 +2,7 @@ import unittest
 import Class_TestVars
 import parselib
 
-class TestParseAdd(unittest.TestCase):
+class TestParseAnd(unittest.TestCase):
     
     def setUp(self):
         super().setUp()
@@ -19,7 +19,7 @@ class TestParseAdd(unittest.TestCase):
                                                                         test_vars.TOK_R2], 
                                                               labels=[])
         
-        self.assertEquals(parselib.parse_add(address, tokens, []), '0101001001000010')
+        self.assertEqual(parselib.parse_add(address, tokens, []), '0101001001000010')
 
     # Test 
     # AND, R1, R1, #1
@@ -32,4 +32,4 @@ class TestParseAdd(unittest.TestCase):
                                                                   test_vars.TOK_IMM5_1],
                                                         labels=[])
         
-        self.assertEquals(parselib.parse_add(address, tokens, []), '0101001010100001')
+        self.assertEqual(parselib.parse_add(address, tokens, []), '0101001010100001')

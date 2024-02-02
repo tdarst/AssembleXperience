@@ -7,6 +7,15 @@ class TestVars():
     def __init__(self):
         self.ADDRESS_0X3001 = '0x3001'
         self.ADDRESS_0X3000 = '0x3000'
+        self.ADDRESS_0X3010 = '0x3010'
+
+        self.HEX_VAL_0X5 = '0x5'
+        self.HEX_VAL_0X20 = '0x20'
+        self.HEX_VAL_0X21 = '0x21'
+        self.HEX_VAL_0X22 = '0x22'
+        self.HEX_VAL_0X23 = '0x23'
+        self.HEX_VAL_0X24 = '0x24'
+        self.HEX_VAL_0X25 = '0x25'
         
         self.TOK_R1 = 'R1'
         self.TOK_R2 = 'R2'
@@ -14,8 +23,11 @@ class TestVars():
         self.TOK_IMM5_1 = '#1'
         self.TOK_IMM5_2 = '#2'
 
+        self.TOK_STRING_ABCD = 'abcd'
+
         self.TOK_LABEL_LOOP = 'LOOP'
         self.TOK_LABEL_NUM = 'NUM'
+        self.TOK_LABEL_STRING = 'STRING'
 
         self.TOK_ADD = 'ADD'
         self.TOK_AND  = 'AND'
@@ -33,7 +45,26 @@ class TestVars():
         self.TOK_LD = 'LD'
         self.TOK_LDI = 'LDI'
         self.TOK_LDR = 'LDR'
-        
+        self.TOK_LEA = 'LEA'
+        self.TOK_NOT = 'NOT'
+        self.TOK_RET = 'RET'
+        self.TOK_RTI = 'RTI'
+        self.TOK_ST = 'ST'
+        self.TOK_STI = 'STI'
+        self.TOK_STR = 'STR'
+
+        self.TOK_TRAP = 'TRAP'
+        self.TOK_GETC = 'GETC'
+        self.TOK_OUT = 'OUT'
+        self.TOK_PUTS = 'PUTS'
+        self.TOK_IN = 'IN'
+        self.TOK_PUTSP = 'PUTSP'
+        self.TOK_HALT = 'HALT'
+
+        self.TOK_ORIG = '.ORIG'
+        self.TOK_FILL = '.FILL'
+        self.TOK_BLKW = '.BLKW'
+        self.TOK_STRINGZ = '.STRINGZ'
 
         self.TESTER_LABEL_LOOKUP = {}
 

@@ -2,7 +2,7 @@ import unittest
 import Class_TestVars
 import parselib
 
-class TestParseBr(unittest.TestCase):
+class TestParseLd(unittest.TestCase):
     
     def setUp(self):
         super().setUp()
@@ -21,11 +21,11 @@ class TestParseBr(unittest.TestCase):
         label_lookup = test_vars.generate_tester_label_lookup(label=test_vars.TOK_LABEL_LOOP,
                                                               address=test_vars.ADDRESS_0X3001)
         
-        self.assertEquals(parselib.parse_ld(address, tokens, label_lookup), '0010001000000000')
+        self.assertEqual(parselib.parse_ld(address, tokens, label_lookup), '0010001000000000')
 
-        # Test
-    # x3000 LD R1 LOOP
-    # x3001 LOOP
+    # Test
+    # x3000 LOOP
+    # x3001 LD R1 LOOP
     def test_Given_LD_R1_LABEL_Offset_Negative_Produce_Correct_Binary_String(self):
         test_vars = self.test_vars
         address = test_vars.ADDRESS_0X3001
@@ -36,4 +36,4 @@ class TestParseBr(unittest.TestCase):
         label_lookup = test_vars.generate_tester_label_lookup(label=test_vars.TOK_LABEL_LOOP,
                                                               address=test_vars.ADDRESS_0X3000)
         
-        self.assertEquals(parselib.parse_ld(address, tokens, label_lookup), '0010001000000000')
+        self.assertEqual(parselib.parse_ld(address, tokens, label_lookup), '0010001111111110')

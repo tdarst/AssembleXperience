@@ -1,5 +1,8 @@
 IMM5_INT_RANGE = range(-16, 15)
 
+RET_BIN_STRING = '1100000111000000'
+RTI_BIN_STRING = '1000000000000000'
+
 # 3 bits
 REGISTERS = {
     'R0':0x0,
@@ -14,11 +17,12 @@ REGISTERS = {
 
 # 8 bits
 TRAPS = {
-    'GETC': 0x20,
-    'OUT' : 0x21,
-    'PUTS': 0x22,
-    'IN'  : 0x23,
-    'HALT': 0x25
+    'GETC'  : 0x20,
+    'OUT'   : 0x21,
+    'PUTS'  : 0x22,
+    'IN'    : 0x23,
+    'PUTSP' : 0x24,
+    'HALT'  : 0x25
 } #PUTS, GETC, etc. 
 
 # 4 bits
@@ -77,7 +81,7 @@ KEY_OPERANDS = 'operands'
 KEY_LABELS = 'labels'
 
 def int_to_bin(num: int) -> str:
-    return bin(num)[2:]
+    return bin(num)[2:] if num >= 0 else bin(num) [3:]
 
 def imm5_to_int(imm_str: str) -> int:
     return int(imm_str.replace('#', ''))
@@ -134,4 +138,9 @@ def calc_offset11(label_address: str, current_address: str) -> str:
 
 def get_nzp_bin_string(opcode: str) -> str:
     nzp = [int('n' in opcode), int('z' in opcode), int('p' in opcode)]
-    return ''.join([str(item) for item in nzp])
+
+    nzp_string = ''.join([str(item) for item in nzp]) \
+                 if sum(nzp) > 0 \
+                 else '111'
+    
+    return nzp_string

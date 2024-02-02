@@ -21,7 +21,7 @@ class TestParseJsr(unittest.TestCase):
         label_lookup = test_vars.generate_tester_label_lookup(label=test_vars.TOK_LABEL_LOOP,
                                                               address=test_vars.ADDRESS_0X3001)
         
-        self.assertEquals(parselib.parse_jsr(address, tokens, label_lookup), '0100100000000000')
+        self.assertEqual(parselib.parse_jsr(address, tokens, label_lookup), '0100100000000000')
 
     # Test
     # x3000 LOOP
@@ -36,4 +36,4 @@ class TestParseJsr(unittest.TestCase):
         label_lookup = test_vars.generate_tester_label_lookup(label=test_vars.TOK_LABEL_LOOP,
                                                               address=test_vars.ADDRESS_0X3000)
         
-        self.assertEquals(parselib.parse_jsr(address, tokens, label_lookup), '0101001001000010')
+        self.assertEqual(parselib.parse_jsr(address, tokens, label_lookup), '0100111111111110')
