@@ -6,66 +6,15 @@ KEY_OPCODE = utils.KEY_OPCODE
 KEY_OPERANDS = utils.KEY_OPERANDS
 KEY_LABELS = utils.KEY_LABELS
 
-PARSE_DICT = {
-    'BR'   : parselib.parse_br,
-    'BRn'  : parselib.parse_br,
-    'BRz'  : parselib.parse_br,
-    'BRp'  : parselib.parse_br,
-    'BRnz' : parselib.parse_br,
-    'BRnp' : parselib.parse_br,
-    'BRzp' : parselib.parse_br,
-    'BRnzp': parselib.parse_br,
-
-    'ADD' : parselib.parse_add,
-    'LD'  : parselib.parse_ld,
-    'ST'  : parselib.parse_st,
-    'JSR' : parselib.parse_jsr,
-    'JSRR': parselib.parse_jsrr,
-    'AND' : parselib.parse_and,
-    'LDR' : parselib.parse_ldr,
-    'STR' : parselib.parse_str,
-    'RTI' : parselib.parse_rti,
-    'NOT' : parselib.parse_not,
-    'LDI' : parselib.parse_ldi,
-    'STI' : parselib.parse_sti,
-    'JMP' : parselib.parse_jmp,
-    'RET' : parselib.parse_ret,
-    'LEA' : parselib.parse_lea,
-
-    'TRAP': parselib.parse_trap,
-    'GETC': parselib.parse_explicit_trap,
-    'OUT' : parselib.parse_explicit_trap,
-    'PUTS': parselib.parse_explicit_trap,
-    'IN'  : parselib.parse_explicit_trap,
-    'HALT': parselib.parse_explicit_trap,
-
-    '.ORIG': parselib.parse_orig,
-    '.END' : parselib.parse_end,
-    '.FILL': parselib.parse_fill,
-    '.BLKW': parselib.parse_blkw,
-    '.STRINGZ': parselib.parse_stringz
-}
-
-def createTokenObject(tok: str) -> object:
-    int_value = utils.overall_dictionary[tok]
-    hex_value = hex(int_value)
-    bin_value = utils.int_to_bin(int_value)
-    obj = types.SimpleNamespace(
-        token = tok,
-        int_val = int_value,
-        hex_val = hex_value,
-        bin_val = bin_value
-    )
-
 def pass1(code_to_parse: str) -> dict:
 
     # Program Counter defaults to starting at 0
     address_counter = 0x0
 
     symbol_table = {
-        # address : {opcode : opcode,
-        #            operands : [operand1, operand2, etc] 
-        #            unresolved: [var1, label1]}
+        # address : {opcode : opcode (ops, pseudoOps, dots, etc.),
+        #            operands : [registers, labels, strings, etc.] 
+        #            labels: [label1, label2, etc.]}
     }
 
     label_lookup = {}
@@ -150,7 +99,7 @@ def main():
     debugString = r'LC3\Test_Code\Assembly_Test.txt'
     debugString2 = r"LC3\Test_Code\2048.asm"
 
-    path = addTest
+    path = debugString
 
     def runBothPasses():
         with open(path, 'r') as file:
