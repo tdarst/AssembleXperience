@@ -1,12 +1,12 @@
 import unittest
-import Class_TestVars
+from . import Class_TestVars_parselib
 import parselib
 
 class TestParseOrig(unittest.TestCase):
     
     def setUp(self):
         super().setUp()
-        self.test_vars = Class_TestVars.TestVars()
+        self.test_vars = Class_TestVars_parselib.TestVars()
 
     # Test
     # .ORIG x3000

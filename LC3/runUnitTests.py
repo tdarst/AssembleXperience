@@ -1,4 +1,4 @@
 from Unit_Tests import UT_master
 
-
-UT_master.main()
+if __name__=='__main__':    
+    UT_master.main()

@@ -1,12 +1,12 @@
 import unittest
-import Class_TestVars
+from . import Class_TestVars_parselib
 import parselib
 
 class TestParseAnd(unittest.TestCase):
     
     def setUp(self):
         super().setUp()
-        self.test_vars = Class_TestVars.TestVars()
+        self.test_vars = Class_TestVars_parselib.TestVars()
 
     # Test 
     # AND, R1, R1, R2

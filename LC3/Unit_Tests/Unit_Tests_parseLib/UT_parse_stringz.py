@@ -1,12 +1,12 @@
 import unittest
-import Class_TestVars
+from . import Class_TestVars_parselib
 import parselib
 
 class TestParseStringz(unittest.TestCase):
     
     def setUp(self):
         super().setUp()
-        self.test_vars = Class_TestVars.TestVars()
+        self.test_vars = Class_TestVars_parselib.TestVars()
 
         self.test_string_abcd = "0000000001100001\n0000000001100010\n0000000001100011\n0000000001100100\n0000000000000000"
 

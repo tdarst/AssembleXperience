@@ -1,4 +1,5 @@
-IMM5_INT_RANGE = range(-16, 15)
+IMM5_INT_RANGE = range(-16, 16)
+OFFSET6_INT_RANGE = range(-32, 32)
 
 RET_BIN_STRING = '1100000111000000'
 RTI_BIN_STRING = '1000000000000000'
@@ -81,7 +82,7 @@ KEY_OPERANDS = 'operands'
 KEY_LABELS = 'labels'
 
 def int_to_bin(num: int) -> str:
-    return bin(num)[2:] if num >= 0 else bin(num) [3:]
+    return bin(num)[2:] if num >= 0 else bin(num)[3:]
 
 def imm5_to_int(imm_str: str) -> int:
     return int(imm_str.replace('#', ''))
@@ -100,18 +101,35 @@ def is_register(tok: str) -> bool:
 
 #TODO: FIX THIS RETURN
 def is_imm5(tok: str) -> bool:
-    return tok.startswith('#')
+    try:
+        isImm5 = tok.startswith('#') \
+                 and int(tok.replace('#','')) in IMM5_INT_RANGE # This specifies min -16, max 15
+    except:
+        isImm5 = False
+
+    return isImm5
     
 def is_label(tok: str, label_lookup: dict) -> bool:
     tok_is_label = tok in label_lookup
     return tok_is_label
 
-def is_offset6(tok: str) -> bool: pass
+def is_offset6(tok: str) -> bool:
+    try:
+        isOffset6 = tok.startswith('#') \
+        and int(tok.replace('#','')) in OFFSET6_INT_RANGE
+    except:
+        isOffset6 = False
+    
+    return isOffset6
 
 # Takes positive binary string and returns it's two's complement
 def calc_twos_complement(bin_string: str):
-    inverted_bits = ''.join('1' if bit == '0' else '0' for bit in bin_string)
-    twos_complement = int_to_bin(int(inverted_bits, 2) + 1)
+    if not all(bit == '0' for bit in bin_string):
+        inverted_bits = ''.join('1' if bit == '0' else '0' for bit in bin_string)
+        twos_complement = int_to_bin(int(inverted_bits, 2) + 1)
+    else:
+        twos_complement = '0000'
+        
     return twos_complement
 
 def calc_offset9(label_address: str, current_address: str) -> str:
