@@ -1,4 +1,4 @@
-from Unit_Tests import UT_master
+from Scripts.Unit_Tests import UT_master
 
 # Runs all unit tests.
 if __name__=='__main__':    
