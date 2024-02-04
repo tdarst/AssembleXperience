@@ -9,11 +9,16 @@ KEY_OPCODE = utils.KEY_OPCODE
 KEY_OPERANDS = utils.KEY_OPERANDS
 KEY_LABELS = utils.KEY_LABELS
 
+# =============================================================================
+# Name: parse_add_or_and
+# Purpose: Takes tokens for ADD and AND operations and turns them into their
+#          binary equivalent
+# =============================================================================
 def parse_add_or_and(address: str, tokens: dict, label_lookup: dict) -> str:
-    #TODO: ADD VALIDATION
     opcode = tokens[KEY_OPCODE]
     operands = tokens[KEY_OPERANDS]
     OP1, OP2, OP3 = operands[0], operands[1], operands[2]
+
     bin_opcode = utils.int_to_bin(utils.OPCODE[opcode]).zfill(OPCODE_LENGTH)
     bin_OP1 = utils.int_to_bin(utils.REGISTERS[OP1]).zfill(REGISTER_LENGTH)
     bin_OP2 = utils.int_to_bin(utils.REGISTERS[OP2]).zfill(REGISTER_LENGTH)
@@ -29,6 +34,11 @@ def parse_add_or_and(address: str, tokens: dict, label_lookup: dict) -> str:
 
     return bin_string
 
+# =============================================================================
+# Name: parse_jmp_or_jsrr
+# Purpose: Takes tokens for JMP and JSRR operations and turns them into their
+#          binary equivalent
+# =============================================================================
 def parse_jmp_or_jsrr(address: str, tokens: dict, label_lookup: dict) -> str:
     opcode = tokens[KEY_OPCODE]
     OP1 = tokens[KEY_OPERANDS][0]
@@ -42,6 +52,11 @@ def parse_jmp_or_jsrr(address: str, tokens: dict, label_lookup: dict) -> str:
 
     return bin_string
 
+# ================================================================================
+# Name: parse_ld_ldi_lea
+# Purpose: Takes tokens for LD, LDI, AND LEA operations and turns them into their
+#          binary equivalent
+# ================================================================================
 def parse_ld_ldi_lea(address: str, tokens: dict, label_lookup: dict) -> str:
     opcode = tokens[KEY_OPCODE]
     operands = tokens[KEY_OPERANDS]
@@ -58,6 +73,11 @@ def parse_ld_ldi_lea(address: str, tokens: dict, label_lookup: dict) -> str:
 
     return bin_string
 
+# ================================================================================
+# Name: parse_ldr_str
+# Purpose: Takes tokens for LDR operations and turns them into their
+#          binary equivalent
+# ================================================================================
 def parse_ldr_str(address: str, tokens: dict, label_lookup: dict) -> str:
     opcode = tokens[KEY_OPCODE]
     operands = tokens[KEY_OPERANDS]
@@ -78,13 +98,11 @@ def parse_ldr_str(address: str, tokens: dict, label_lookup: dict) -> str:
 
     return bin_string
 
-
-def parse_add(address: str, tokens: dict, label_lookup: dict) -> str:
-    return parse_add_or_and(address, tokens, label_lookup)
-
-def parse_and(address: str, tokens: dict, label_lookup: dict) -> str:
-    return parse_add_or_and(address, tokens, label_lookup)
-
+# ================================================================================
+# Name: parse_br
+# Purpose: Takes tokens for BR operations and turns them into their
+#          binary equivalent
+# ================================================================================
 def parse_br(address: str, tokens: dict, label_lookup: dict) -> str:
     opcode = tokens[KEY_OPCODE]
     operands = tokens[KEY_OPERANDS]
@@ -99,9 +117,11 @@ def parse_br(address: str, tokens: dict, label_lookup: dict) -> str:
     bin_string = bin_opcode + nzp_string + offset9_string
     return bin_string
 
-def parse_jmp(address: str, tokens: dict, label_lookup: dict) -> str:
-    return parse_jmp_or_jsrr(address, tokens, label_lookup)
-    
+# ================================================================================
+# Name: parse_jsr
+# Purpose: Takes tokens for JSR operations and turns them into their
+#          binary equivalent
+# ================================================================================
 def parse_jsr(address: str, tokens: dict, label_lookup: dict) -> str:
     opcode = tokens[KEY_OPCODE]
     label = tokens[KEY_OPERANDS][0]
@@ -116,21 +136,11 @@ def parse_jsr(address: str, tokens: dict, label_lookup: dict) -> str:
 
     return bin_string
 
-def parse_jsrr(address: str, tokens: dict, label_lookup: dict) -> str:
-    return parse_jmp_or_jsrr(address, tokens, label_lookup)
-
-def parse_ld(address: str, tokens: dict, label_lookup: dict) -> str:
-    return parse_ld_ldi_lea(address, tokens, label_lookup)
-
-def parse_ldi(address: str, tokens: dict, label_lookup: dict) -> str:
-    return parse_ld_ldi_lea(address, tokens, label_lookup)
-
-def parse_ldr(address: str, tokens: dict, label_lookup: dict) -> str:
-    return parse_ldr_str(address, tokens, label_lookup)
-
-def parse_lea(address: str, tokens: dict, label_lookup: dict) -> str:
-    return parse_ld_ldi_lea(address, tokens, label_lookup)
-
+# ================================================================================
+# Name: parse_not
+# Purpose: Takes tokens for NOT operations and turns them into their
+#          binary equivalent
+# ================================================================================
 def parse_not(address: str, tokens: dict, label_lookup: dict) -> str:
     opcode = tokens[KEY_OPCODE]
     operands = tokens[KEY_OPERANDS]
@@ -146,12 +156,11 @@ def parse_not(address: str, tokens: dict, label_lookup: dict) -> str:
 
     return bin_string
 
-def parse_ret(address: str, tokens: dict, label_lookup: dict) -> str:
-    return utils.RET_BIN_STRING
-
-def parse_rti(address: str, tokens: dict, label_lookup: dict) -> str:
-    return utils.RTI_BIN_STRING
-
+# ================================================================================
+# Name: parse_st_sti
+# Purpose: Takes tokens for ST AND STI operations and turns them into their
+#          binary equivalent
+# ================================================================================
 def parse_st_sti(address: str, tokens: dict, label_lookup: dict) -> str:
     opcode = tokens[KEY_OPCODE]
     operands = tokens[KEY_OPERANDS]
@@ -168,16 +177,11 @@ def parse_st_sti(address: str, tokens: dict, label_lookup: dict) -> str:
 
     return bin_string
 
-
-def parse_st(address: str, tokens: dict, label_lookup: dict) -> str:
-    return parse_st_sti(address, tokens, label_lookup)
-
-def parse_sti(address: str, tokens: dict, label_lookup: dict) -> str:
-    return parse_st_sti(address, tokens, label_lookup)
-
-def parse_str(address: str, tokens: dict, label_lookup: dict) -> str:
-    return parse_ldr_str(address, tokens, label_lookup)
-
+# ================================================================================
+# Name: parse_trap
+# Purpose: Takes tokens for TRAP X20 through X25 operations and turns them into 
+#          their binary equivalent
+# ===============================================================================
 def parse_trap(address: str, tokens: dict, label_lookup: dict) -> str:
     opcode = tokens[KEY_OPCODE]
     operands = tokens[KEY_OPERANDS]
@@ -190,6 +194,11 @@ def parse_trap(address: str, tokens: dict, label_lookup: dict) -> str:
 
     return bin_string
 
+# ================================================================================
+# Name: parse_explicit_trap
+# Purpose: Takes tokens for trap calls by name (i.e. HALT, GETC, OUT, etc.) and
+#          turns them into their binary equivalent
+# ===============================================================================
 def parse_explicit_trap(address: str, tokens: dict, label_lookup: dict) -> str:
     opcode = 'TRAP'
     trap_vector = tokens[KEY_OPCODE]
@@ -201,6 +210,11 @@ def parse_explicit_trap(address: str, tokens: dict, label_lookup: dict) -> str:
 
     return bin_string
 
+# ================================================================================
+# Name: parse_orig
+# Purpose: Takes tokens for .ORIG lines and turns them into their binary
+#          equivalent.
+# ===============================================================================
 def parse_orig(address: str, tokens: dict, label_lookup: dict) -> str:
     operands = tokens[KEY_OPERANDS]
     hex_val = operands[0]
@@ -209,6 +223,11 @@ def parse_orig(address: str, tokens: dict, label_lookup: dict) -> str:
 
     return bin_string
 
+# ================================================================================
+# Name: parse_fill
+# Purpose: Takes tokens for .FILL lines and turns them into their binary
+#          equivalent.
+# ===============================================================================
 def parse_fill(address: str, tokens: dict, label_lookup: dict) -> str:
     operands = tokens[KEY_OPERANDS]
     imm5_val = operands[0]
@@ -218,6 +237,11 @@ def parse_fill(address: str, tokens: dict, label_lookup: dict) -> str:
 
     return bin_string
 
+# ================================================================================
+# Name: parse_blkw
+# Purpose: Takes tokens for .BLKW lines and turns them into their binary
+#          equivalent.
+# ===============================================================================
 def parse_blkw(address: str, tokens: dict, label_lookup: dict) -> str:
     operand = tokens[KEY_OPERANDS][0]
     imm5_val = utils.imm5_to_int(operand)
@@ -228,6 +252,11 @@ def parse_blkw(address: str, tokens: dict, label_lookup: dict) -> str:
 
     return bin_string
 
+# ================================================================================
+# Name: parse_stringz
+# Purpose: Takes tokens for .STRINGZ lines and turns them into their binary
+#          equivalent.
+# ===============================================================================
 def parse_stringz(address: str, tokens: dict, label_lookup: dict) -> str:
     operand = tokens[KEY_OPERANDS][0]
     bin_string = ''
@@ -238,9 +267,119 @@ def parse_stringz(address: str, tokens: dict, label_lookup: dict) -> str:
     
     return bin_string
 
+# ===============================================================================
+# Name: parse_add
+# Purpose: Takes tokens for ADD lines and turns them into their binary
+#          equivalent. Uses parse_add_or_and.
+# ===============================================================================
+def parse_add(address: str, tokens: dict, label_lookup: dict) -> str:
+    return parse_add_or_and(address, tokens, label_lookup)
+
+# ===============================================================================
+# Name: parse_and
+# Purpose: Takes tokens for AND lines and turns them into their binary
+#          equivalent. Uses parse_add_or_and.
+# ===============================================================================
+def parse_and(address: str, tokens: dict, label_lookup: dict) -> str:
+    return parse_add_or_and(address, tokens, label_lookup)
+
+# ===============================================================================
+# Name: parse_jmp
+# Purpose: Takes tokens for JMP lines and turns them into their binary
+#          equivalent. Uses parse_jmp_or_jsrr.
+# ===============================================================================
+def parse_jmp(address: str, tokens: dict, label_lookup: dict) -> str:
+    return parse_jmp_or_jsrr(address, tokens, label_lookup)
+
+# ===============================================================================
+# Name: parse_jsrr
+# Purpose: Takes tokens for JSRR lines and turns them into their binary
+#          equivalent. Uses parse_jmp_or_jsrr.
+# ===============================================================================
+def parse_jsrr(address: str, tokens: dict, label_lookup: dict) -> str:
+    return parse_jmp_or_jsrr(address, tokens, label_lookup)
+
+# ===============================================================================
+# Name: parse_ld
+# Purpose: Takes tokens for LD lines and turns them into their binary
+#          equivalent. Uses parse_ld_ldi_lea.
+# ===============================================================================
+def parse_ld(address: str, tokens: dict, label_lookup: dict) -> str:
+    return parse_ld_ldi_lea(address, tokens, label_lookup)
+
+# ===============================================================================
+# Name: parse_ldi
+# Purpose: Takes tokens for LDI lines and turns them into their binary
+#          equivalent. Uses parse_ld_ldi_lea.
+# ===============================================================================
+def parse_ldi(address: str, tokens: dict, label_lookup: dict) -> str:
+    return parse_ld_ldi_lea(address, tokens, label_lookup)
+
+# ===============================================================================
+# Name: parse_ldr
+# Purpose: Takes tokens for LDR lines and turns them into their binary
+#          equivalent. Uses parse_ldr_str.
+# ===============================================================================
+def parse_ldr(address: str, tokens: dict, label_lookup: dict) -> str:
+    return parse_ldr_str(address, tokens, label_lookup)
+
+# ===============================================================================
+# Name: parse_lea
+# Purpose: Takes tokens for LEA lines and turns them into their binary
+#          equivalent. Uses parse_ld_ldi_lea.
+# ===============================================================================
+def parse_lea(address: str, tokens: dict, label_lookup: dict) -> str:
+    return parse_ld_ldi_lea(address, tokens, label_lookup)
+
+# ===============================================================================
+# Name: parse_ret
+# Purpose: RET only ever has one binary translation. Simply returns that
+#          binary string.
+# ===============================================================================
+def parse_ret(address: str, tokens: dict, label_lookup: dict) -> str:
+    return utils.RET_BIN_STRING
+
+# ===============================================================================
+# Name: parse_rti
+# Purpose: RTI only ever has one binary translation. Simply returns that
+#          binary string.
+# ===============================================================================
+def parse_rti(address: str, tokens: dict, label_lookup: dict) -> str:
+    return utils.RTI_BIN_STRING
+
+# ===============================================================================
+# Name: parse_st
+# Purpose: Takes tokens for ST lines and turns them into their binary
+#          equivalent. Uses parse_st_sti.
+# ===============================================================================
+def parse_st(address: str, tokens: dict, label_lookup: dict) -> str:
+    return parse_st_sti(address, tokens, label_lookup)
+
+# ===============================================================================
+# Name: parse_sti
+# Purpose: Takes tokens for STI lines and turns them into their binary
+#          equivalent. Uses parse_st_sti.
+# ===============================================================================
+def parse_sti(address: str, tokens: dict, label_lookup: dict) -> str:
+    return parse_st_sti(address, tokens, label_lookup)
+
+# ===============================================================================
+# Name: parse_str
+# Purpose: Takes tokens for STR lines and turns them into their binary
+#          equivalent. Uses parse_ldr_str.
+# ===============================================================================
+def parse_str(address: str, tokens: dict, label_lookup: dict) -> str:
+    return parse_ldr_str(address, tokens, label_lookup)
+
+# ===============================================================================
+# Name: parse_end
+# Purpose: END has no binary translation. Simply returns a blank string
+# ===============================================================================
 def parse_end(address: str, tokens: dict, label_lookup: dict) -> str:
     return ''
 
+
+# PARSE_DICT is used to map all opcode tokens to their respective parsing functions
 PARSE_DICT = {
     'BR'   : parse_br,
     'BRn'  : parse_br,

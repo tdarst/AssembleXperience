@@ -24,7 +24,7 @@ def check_if_solo_label(tokens: list) -> str:
     return solo_label
 
 def find_opcode_in_tokens(tokens: list) -> tuple[str, int]:
-    return next((token, tokens.index(token)) for token in tokens if token in utils.opcode_dictionary)
+    return next(((token, tokens.index(token)) for token in tokens if token in utils.opcode_dictionary), (None, 0))
 
 def generate_tokens(line: str) -> list:
     split_line = line.replace(',',' ').split(' ')
@@ -117,7 +117,7 @@ def main():
     debugString = r'LC3\Test_Code\Assembly_Test.txt'
     assemblyFactorial = r"LC3\Test_Code\AssemblyFactorial.asm"
 
-    path = assemblyFactorial
+    path = addTest
 
     def runBothPasses():
         with open(path, 'r') as file:
