@@ -3,6 +3,14 @@ import utils
 KEY_OPCODE = utils.KEY_OPCODE
 KEY_OPERANDS = utils.KEY_OPERANDS
 KEY_LABELS = utils.KEY_LABELS
+
+# =============================================================================
+# Name: TestVars
+# Purpose: Creates variables to be used for testing so that I can reuse them
+#          easily and also leaves less floating strings in the unit tests.
+#          these are mostly used in parselib unittesting but this class is also
+#          inherited by TestVars_utils for use in a few utils unit tests.
+# =============================================================================
 class TestVars():
     def __init__(self):
         self.ADDRESS_0X3001 = '0x3001'

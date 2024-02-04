@@ -1,5 +1,12 @@
 from ..Unit_Tests_parselib import Class_TestVars_parselib
 
+# =============================================================================
+# Name: TestVars_utils
+# Purpose: Creates variables to be used for testing so that I can reuse them
+#          easily and also leaves less floating strings in the unit tests.
+#          inherits TestVars which is the class used in parselib unit tests
+#          mainly for it's generate symbol table and label lookup functions.
+# =============================================================================
 class TestVars_utils(Class_TestVars_parselib.TestVars):
     def __init__(self):
         super().__init__()
