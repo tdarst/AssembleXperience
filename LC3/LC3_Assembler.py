@@ -26,6 +26,11 @@ def check_if_solo_label(tokens: list) -> str:
 def find_opcode_in_tokens(tokens: list) -> tuple[str, int]:
     return next((token, tokens.index(token)) for token in tokens if token in utils.opcode_dictionary)
 
+def generate_tokens(line: str) -> list:
+    split_line = line.replace(',',' ').split(' ')
+    tokens_no_blanks = [item for item in split_line if item.strip()]
+    return tokens_no_blanks
+
 def update_label_lookup(address: str, labels: list, label_lookup: dict) -> dict:
     [label_lookup.update({label:address}) for label in labels if labels]
     return label_lookup
@@ -55,11 +60,11 @@ def pass1(code_to_parse: str) -> tuple[dict, dict]:
     label_lookup = {
         # label_name : label_address
     }
-    
-    # Gets rid of tabs and newlines
+
     for line in ready_code_for_parsing(code_to_parse):
+
         # Get parts of line as a list of tokens
-        tokens = line.replace(',','').split(' ')
+        tokens = generate_tokens(line)
 
         # Check if line is a solo label
         solo_label = check_if_solo_label(tokens)
@@ -110,9 +115,9 @@ def pass2(symbol_table, label_lookup):
 def main():
     addTest = r'LC3\Test_Code\add_test.txt'
     debugString = r'LC3\Test_Code\Assembly_Test.txt'
-    debugString2 = r"LC3\Test_Code\2048.asm"
+    assemblyFactorial = r"LC3\Test_Code\AssemblyFactorial.asm"
 
-    path = debugString
+    path = assemblyFactorial
 
     def runBothPasses():
         with open(path, 'r') as file:

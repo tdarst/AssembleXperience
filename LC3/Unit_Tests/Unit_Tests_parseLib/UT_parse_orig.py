@@ -14,7 +14,7 @@ class TestParseOrig(unittest.TestCase):
         test_vars = self.test_vars
         address = test_vars.ADDRESS_0X3000
         tokens = test_vars.generate_tester_symbol_table(opcode=test_vars.TOK_ORIG, 
-                                                        operands=[0x3000], 
+                                                        operands=[test_vars.ADDRESS_0X3000], 
                                                         labels=[])
         
         self.assertEqual(parselib.parse_orig(address, tokens, []), '0011000000000000')

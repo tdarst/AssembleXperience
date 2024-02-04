@@ -239,7 +239,7 @@ def parse_stringz(address: str, tokens: dict, label_lookup: dict) -> str:
     return bin_string
 
 def parse_end(address: str, tokens: dict, label_lookup: dict) -> str:
-    return ''.zfill(MAX_LINE_LENGTH)
+    return ''
 
 PARSE_DICT = {
     'BR'   : parse_br,
