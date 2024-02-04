@@ -1,5 +1,4 @@
 # Holds all of the test suites for unit tests.
-
 import unittest
 from .Unit_Tests_parselib import (UT_parse_add,
                                   UT_parse_and,
@@ -38,6 +37,10 @@ from .Unit_Tests_utils import (UT_int_to_bin,
                                UT_calc_offset11,
                                UT_get_nzp_bin_string)
 
+# ==============================================================================
+# Name: parselib_Tests
+# Purpose: Loads all of the parselib unit tests into a test suite and returns it
+# ==============================================================================
 def parselib_Tests():
     # Create a TestLoader and Suite
     loader = unittest.TestLoader()
@@ -69,6 +72,10 @@ def parselib_Tests():
 
     return suite
 
+# ==============================================================================
+# Name: utils_Tests
+# Purpose: Loads all of the utils unit tests into a test suite and returns it
+# ==============================================================================
 def utils_Tests():
     # Create a TestLoader and Suite
     loader = unittest.TestLoader()
@@ -91,6 +98,10 @@ def utils_Tests():
 
     return suite
 
+# ==============================================================================
+# Name: main
+# Purpose: When called, loads all of the unit tests and then runs them.
+# ==============================================================================
 def main():
     # Generate the test suites
     suite_parse_lib = parselib_Tests()

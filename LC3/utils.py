@@ -6,7 +6,8 @@ RTI_BIN_STRING = '1000000000000000'
 
 ORIG_OPCODE_NAME = '.ORIG'
 
-# 3 bits
+# Length: 3 bits
+# Dictioanry of all registers and their vectors.
 REGISTERS = {
     'R0':0x0,
     'R1':0x1,
@@ -18,7 +19,8 @@ REGISTERS = {
     'R7':0x7
 }
 
-# 8 bits
+# Length: 8 bits
+# Dictionary of all traps and their vectors.
 TRAPS = {
     'GETC'  : 0x20,
     'OUT'   : 0x21,
@@ -28,7 +30,8 @@ TRAPS = {
     'HALT'  : 0x25
 } #PUTS, GETC, etc. 
 
-# 4 bits
+# Length: 4 bits
+# Dictionary of all opcodes and their vectors.
 OPCODE = {
     'BR'   : 0x0,
     'BRn'  : 0x0,
@@ -60,6 +63,7 @@ OPCODE = {
     **TRAPS # includes the TRAPS dictionary
 }
 
+# Dictionary of all pseudo-ops and their (non-existant) vectors.
 PSEUDOS = {
     '.ORIG'   : None,
     '.END'    : None,
@@ -68,40 +72,70 @@ PSEUDOS = {
     '.STRINGZ': None
 }
 
+# Dictionary of all valid operations
 overall_dictionary = {
     **OPCODE,
     **REGISTERS,
     **PSEUDOS
 }
 
+# Dictionary of all opcodes
 opcode_dictionary = {
     **OPCODE,
     **PSEUDOS
 }
 
+# Strings for symbol_table keys
 KEY_OPCODE = 'opcode'
 KEY_OPERANDS = 'operands'
 KEY_LABELS = 'labels'
 
+# ==============================================================================
+# Name: int_to_bin
+# Purpose: returns the POSITIVE binary string for a given int
+# ==============================================================================
 def int_to_bin(num: int) -> str:
     return bin(num)[2:] if num >= 0 else bin(num)[3:]
 
+# ==============================================================================
+# Name: imm5_to_int
+# Purpose: returns the int value for a given imm5.
+# ==============================================================================
 def imm5_to_int(imm_str: str) -> int:
     return int(imm_str.replace('#', ''))
 
+# ==============================================================================
+# Name: imm5_to_int
+# Purpose: returns the binary value for a given imm5.
+# ==============================================================================
 def imm5_to_bin(imm_str: str) -> str:
     return int_to_bin(imm5_to_int(imm_str))
 
+# ==============================================================================
+# Name: imm5_to_int
+# Purpose: returns the int value for a given hex.
+# ==============================================================================
 def hex_to_int(hex_str: str) -> int:
     return int(hex_str, 16)
 
+# ==============================================================================
+# Name: hex_to_bin
+# Purpose: returns the hex value for a given bin
+# ==============================================================================
 def hex_to_bin(hex_str: str) -> str:
     return int_to_bin(hex_to_int(hex_str))
 
+# ==============================================================================
+# Name: is_register
+# Purpose: returns True if token is a valid register, False otherwise.
+# ==============================================================================
 def is_register(tok: str) -> bool:
     return tok in REGISTERS
 
-#TODO: FIX THIS RETURN
+# ==============================================================================
+# Name: is_imm5
+# Purpose: returns True if token is a valid imm5 value, False otherwise.
+# ==============================================================================
 def is_imm5(tok: str) -> bool:
     try:
         isImm5 = tok.startswith('#') \
@@ -110,11 +144,20 @@ def is_imm5(tok: str) -> bool:
         isImm5 = False
 
     return isImm5
-    
+
+# ==============================================================================
+# Name: is_label
+# Purpose: returns True if token is a valid label, False otherwise. Bases this
+#          on whether it exists in the label_lookup.
+# ==============================================================================
 def is_label(tok: str, label_lookup: dict) -> bool:
     tok_is_label = tok in label_lookup
     return tok_is_label
 
+# ==============================================================================
+# Name: is_offset6
+# Purpose: returns True if token is a valid offset6 value, False otherwise.
+# ==============================================================================
 def is_offset6(tok: str) -> bool:
     try:
         isOffset6 = tok.startswith('#') \
@@ -124,7 +167,10 @@ def is_offset6(tok: str) -> bool:
     
     return isOffset6
 
-# Takes positive binary string and returns it's two's complement
+# ==============================================================================
+# Name: calc_twos_complement
+# Purpose: returns the twos complement of any given binary string.
+# ==============================================================================
 def calc_twos_complement(bin_string: str):
     if not all(bit == '0' for bit in bin_string):
         inverted_bits = ''.join('1' if bit == '0' else '0' for bit in bin_string)
@@ -134,6 +180,10 @@ def calc_twos_complement(bin_string: str):
         
     return twos_complement
 
+# ==============================================================================
+# Name: calc_offset9
+# Purpose: Calculates 9 bit offset value from given current and label addresses.
+# ==============================================================================
 def calc_offset9(label_address: str, current_address: str) -> str:
     label_address = hex_to_int(label_address)
     current_address = hex_to_int(current_address)
@@ -145,6 +195,10 @@ def calc_offset9(label_address: str, current_address: str) -> str:
 
     return offset9
 
+# ===============================================================================
+# Name: calc_offset11
+# Purpose: Calculates 11 bit offset value from given current and label addresses.
+# ===============================================================================
 def calc_offset11(label_address: str, current_address: str) -> str:
     label_address = hex_to_int(label_address)
     current_address = hex_to_int(current_address)
@@ -156,6 +210,11 @@ def calc_offset11(label_address: str, current_address: str) -> str:
 
     return offset11
 
+# ===============================================================================
+# Name: get_nzp_bin_string
+# Purpose: Given a BR opcode, returns it's nzp string. If opcode is just 'BR'
+#          (as opposed to say BRn), returns '111'
+# ===============================================================================
 def get_nzp_bin_string(opcode: str) -> str:
     nzp = [int('n' in opcode), int('z' in opcode), int('p' in opcode)]
 
