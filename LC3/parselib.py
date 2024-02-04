@@ -205,7 +205,7 @@ def parse_orig(address: str, tokens: dict, label_lookup: dict) -> str:
     operands = tokens[KEY_OPERANDS]
     hex_val = operands[0]
 
-    bin_string = utils.int_to_bin(hex_val).zfill(MAX_LINE_LENGTH)
+    bin_string = utils.hex_to_bin(hex_val).zfill(MAX_LINE_LENGTH)
 
     return bin_string
 
@@ -238,7 +238,7 @@ def parse_stringz(address: str, tokens: dict, label_lookup: dict) -> str:
     
     return bin_string
 
-def parse_end(tokens: dict) -> str:
+def parse_end(address: str, tokens: dict, label_lookup: dict) -> str:
     return ''.zfill(MAX_LINE_LENGTH)
 
 PARSE_DICT = {

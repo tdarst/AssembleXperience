@@ -6,7 +6,42 @@ KEY_OPCODE = utils.KEY_OPCODE
 KEY_OPERANDS = utils.KEY_OPERANDS
 KEY_LABELS = utils.KEY_LABELS
 
-def pass1(code_to_parse: str) -> dict:
+def ready_code_for_parsing(code: str) -> str:
+    # Get rid of all tabs and split the code into a list seperated by lines
+    code_list = code.replace("\t", " ").split("\n")
+
+    # Get rid of all comments left
+    code_list_comments_removed = [line.split(";")[0].strip() 
+                                  for line in code_list 
+                                  if line.split(';')[0]]
+
+    return code_list_comments_removed
+
+def check_if_solo_label(tokens: list) -> str:
+    solo_label = None
+    if tokens[0] is tokens[-1] and tokens[0] not in utils.overall_dictionary:
+        solo_label = tokens[0]
+    return solo_label
+
+def find_opcode_in_tokens(tokens: list) -> tuple[str, int]:
+    return next((token, tokens.index(token)) for token in tokens if token in utils.opcode_dictionary)
+
+def update_label_lookup(address: str, labels: list, label_lookup: dict) -> dict:
+    [label_lookup.update({label:address}) for label in labels if labels]
+    return label_lookup
+
+def get_operands(tokens: list, opcode_index: int) -> list:
+    return [token for token in tokens[opcode_index+1:]]
+
+def get_labels(tokens: list, opcode_index: int) -> list:
+    return [token for token in tokens[:opcode_index]]
+
+def check_for_ORIG(address_counter: int, opcode: str, operands: list) -> tuple[int, bool]:
+    if opcode == utils.ORIG_OPCODE_NAME:
+        address_counter = utils.hex_to_int(operands[0])
+    return address_counter
+
+def pass1(code_to_parse: str) -> tuple[dict, dict]:
 
     # Program Counter defaults to starting at 0
     address_counter = 0x0
@@ -17,71 +52,49 @@ def pass1(code_to_parse: str) -> dict:
         #            labels: [label1, label2, etc.]}
     }
 
-    label_lookup = {}
-
-    solo_label = None
+    label_lookup = {
+        # label_name : label_address
+    }
     
     # Gets rid of tabs and newlines
-    for line in code_to_parse.replace("\t", " ").split("\n"):
-        
-        # Gets rid of comments
-        line = line.split(";")[0].strip()
-
+    for line in ready_code_for_parsing(code_to_parse):
         # Get parts of line as a list of tokens
         tokens = line.replace(',','').split(' ')
 
-        # If line is blank
-        if not line:
-            continue
+        # Check if line is a solo label
+        solo_label = check_if_solo_label(tokens)
 
-        # Start address counter at .ORIG
-        elif '.ORIG' in line:
-            # add .ORIG to symbol table
-            address_counter = int(line.split(' ')[1], 16)
+        # If there is a solo label in the last line, add it to the current
+        if solo_label:
+            tokens.insert(0, solo_label)
+            solo_label = None
 
-        # If .END is reached then break
-        elif '.END' in line:
-            break
+        # Find the opcode, save it's name and it's index so it can be used as a dividing line for parsing
+        opcode, opcode_index = find_opcode_in_tokens(tokens)
 
-        # If label is solo
-        elif tokens[0] is tokens[-1] \
-            and tokens[0] not in utils.overall_dictionary:
-            solo_label = tokens[0]
+        # Operands are all tokens occurring after the opcode,
+        # Labels are all tokens occurring before the opcode
+        operands = get_operands(tokens, opcode_index)
+        labels   = get_labels(tokens, opcode_index)
 
-        # Any other line
-        else:
-            # Get parts of line as a list of tokens
-            tokens = line.replace(',','').split(' ')
+        # If .ORIG is in the line then set address_counter to it and don't increment address_counter.
+        address_counter = check_for_ORIG(address_counter, opcode, operands)
 
-            # If there is a solo label in the last line, add it to the current
-            if solo_label:
-                tokens.insert(0, solo_label)
-                solo_label = None
+        # Create a dictionary 
+        # Key: line's hex address 
+        # Values: token categories.
+        address = hex(address_counter)
+        symbol_table[address] = {
+            KEY_OPCODE : opcode,
+            KEY_OPERANDS : operands,
+            KEY_LABELS : labels
+        }
 
-            # Find the opcode, save it's name and it's index so it can be used as a dividing line for parsing
-            find_opcode = next(((token, tokens.index(token)) for token in tokens if token in utils.opcode_dictionary))
-            opcode = find_opcode[0]
-            opcode_index = find_opcode[1]
-
-            # Operands are all tokens occurring after the opcode,
-            # Labels are all tokens occurring before the opcode
-            operands = [token for token in tokens[opcode_index+1:]]
-            labels   = [token for token in tokens[:opcode_index]]
-
-            # Create a key value pair of the hex'd address and the tokens in the line.
-            address = hex(address_counter)
-            symbol_table[address] = {
-                KEY_OPCODE : opcode,
-                KEY_OPERANDS : operands,
-                KEY_LABELS : labels
-            }
-
-            if labels:
-                for label in labels:
-                    label_lookup.update({label : address})
-            
-            # Increment the address_counter
-            address_counter += 0x1
+        # Update label_lookup with any labels
+        label_lookup = update_label_lookup(address, labels, label_lookup)
+        
+        # Increment the address_counter
+        address_counter += 0x1
 
     return symbol_table, label_lookup
 
@@ -109,7 +122,12 @@ def main():
     def runPass1():
         with open(path, 'r') as file:
             readLines = file.read()
-            return pass1(readLines) 
+            return pass1(readLines)
+        
+    def runParseCode():
+        with open(path, 'r') as file:
+            readLines = file.read()
+            return ready_code_for_parsing(readLines)
 
     symbol_table, label_lookup = runPass1()
     print(pass2(symbol_table, label_lookup))
