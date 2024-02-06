@@ -1,5 +1,5 @@
 import os
-from ..Supporting_Libraries import parselib, utils
+from ..Supporting_Libraries import parselib, validlib, utils
 
 KEY_OPCODE = utils.KEY_OPCODE
 KEY_OPERANDS = utils.KEY_OPERANDS
@@ -26,11 +26,11 @@ def ready_code_for_parsing(code: str) -> str:
 # Purpose: Check if a line is a solo label, and returns the label if it is,
 #          returns None if not.
 # ==============================================================================
-def check_if_solo_label(tokens: list) -> str:
-    solo_label = None
+def line_is_solo_label(tokens: list) -> str:
+    is_solo_label = False
     if tokens[0] is tokens[-1] and tokens[0] not in utils.overall_dictionary:
-        solo_label = tokens[0]
-    return solo_label
+        is_solo_label = True
+    return is_solo_label
 
 # ==============================================================================
 # Name: find_opcode_in_tokens
@@ -98,6 +98,9 @@ def pass1(code_to_parse: str) -> tuple[dict, dict]:
     # Program Counter defaults to starting at 0
     address_counter = 0x0
 
+    # Count lines for error output.
+    line_counter = 1
+
     symbol_table = {
         # address : {opcode : opcode (ops, pseudoOps, dots, etc.),
         #            operands : [registers, labels, strings, etc.] 
@@ -107,6 +110,8 @@ def pass1(code_to_parse: str) -> tuple[dict, dict]:
     label_lookup = {
         # label_name : label_address
     }
+    
+    solo_label = None
 
     for line in ready_code_for_parsing(code_to_parse):
 
@@ -114,10 +119,13 @@ def pass1(code_to_parse: str) -> tuple[dict, dict]:
         tokens = generate_tokens(line)
 
         # Check if line is a solo label
-        solo_label = check_if_solo_label(tokens)
+        if line_is_solo_label(tokens):
+            solo_label = tokens[0]
+            line_counter += 1
+            continue
 
         # If there is a solo label in the last line, add it to the current
-        if solo_label:
+        elif solo_label:
             tokens.insert(0, solo_label)
             solo_label = None
 
@@ -136,7 +144,8 @@ def pass1(code_to_parse: str) -> tuple[dict, dict]:
         # Key: line's hex address 
         # Values: token categories.
         address = hex(address_counter)
-        symbol_table[address] = {
+        symbol_table[line_counter] = {
+            'address' : address,
             KEY_OPCODE : opcode,
             KEY_OPERANDS : operands,
             KEY_LABELS : labels
@@ -147,6 +156,7 @@ def pass1(code_to_parse: str) -> tuple[dict, dict]:
         
         # Increment the address_counter
         address_counter += 0x1
+        line_counter += 1
 
     return symbol_table, label_lookup
 
@@ -160,9 +170,18 @@ def pass1(code_to_parse: str) -> tuple[dict, dict]:
 # ==============================================================================
 def pass2(symbol_table, label_lookup):
     machine_code = ''
-    for address, tokens in symbol_table.items():
+    error_string = ''
+    for line_number, tokens in symbol_table.items():
+        # error_string = validlib.validate_line(line_number, tokens, label_lookup)
+        # if not error_string:
+        #     opcode = tokens[KEY_OPCODE]
+        #     bin_string = parselib.PARSE_DICT[opcode](tokens['address'], tokens, label_lookup)
+        # else:
+        #     print(error_string)
+        #     return error_string
+        
         opcode = tokens[KEY_OPCODE]
-        bin_string = parselib.PARSE_DICT[opcode](address, tokens, label_lookup)
+        bin_string = parselib.PARSE_DICT[opcode](tokens['address'], tokens, label_lookup)
         machine_code += f"{bin_string}\n"
 
     return machine_code.rstrip('\n')
@@ -180,9 +199,10 @@ def main(asm_path):
             readLines = asm_file.read()
 
         symbol_table, label_lookup = pass1(readLines)
+        print(symbol_table)
         machine_code = pass2(symbol_table, label_lookup)
 
-        local_path = os.getenv('LOCALAPPDATA')
+        local_path = os.getcwd()
         bin_output_path = os.path.join(local_path, "LC3_Bin_Files")
         if not os.path.exists(bin_output_path):
             os.makedirs(bin_output_path)
@@ -192,6 +212,8 @@ def main(asm_path):
 
         with open(local_file_path, 'w') as local_file:
             local_file.write(machine_code)
+
+        print("OUTPUT COMPLETED - file can be found in LOCALAPPDATA LC3_Bin_Files folder.")
 
     else:
         print("LC3_Assembler, no file path given")

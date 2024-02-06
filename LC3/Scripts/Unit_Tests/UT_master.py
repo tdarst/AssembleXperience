@@ -24,8 +24,8 @@ from .Unit_Tests_parselib import (UT_parse_add,
                                   UT_parse_stringz)
 
 from .Unit_Tests_utils import (UT_int_to_bin,
-                               UT_imm5_to_int,
-                               UT_imm5_to_bin,
+                               UT_hash_to_int,
+                               UT_hash_to_bin,
                                UT_hex_to_int,
                                UT_hex_to_bin,
                                UT_is_register,
@@ -36,6 +36,8 @@ from .Unit_Tests_utils import (UT_int_to_bin,
                                UT_calc_offset9,
                                UT_calc_offset11,
                                UT_get_nzp_bin_string)
+
+from .Unit_Tests_validlib import (UT_validate_add_and)
 
 # ==============================================================================
 # Name: parselib_Tests
@@ -83,8 +85,8 @@ def utils_Tests():
 
     # Load all of the tests into the suite
     suite.addTests(loader.loadTestsFromTestCase(UT_int_to_bin.TestIntToBin))
-    suite.addTests(loader.loadTestsFromTestCase(UT_imm5_to_int.TestImm5ToInt))
-    suite.addTests(loader.loadTestsFromTestCase(UT_imm5_to_bin.TestImm5ToBin))
+    suite.addTests(loader.loadTestsFromTestCase(UT_hash_to_int.TestImm5ToInt))
+    suite.addTests(loader.loadTestsFromTestCase(UT_hash_to_bin.TestImm5ToBin))
     suite.addTests(loader.loadTestsFromTestCase(UT_hex_to_int.TestHexToInt))
     suite.addTests(loader.loadTestsFromTestCase(UT_hex_to_bin.TestHexToBin))
     suite.addTests(loader.loadTestsFromTestCase(UT_is_register.TestIsRegister))
@@ -98,18 +100,31 @@ def utils_Tests():
 
     return suite
 
+def validlib_Tests():
+    # Create a TestLoader and Suite
+    loader = unittest.TestLoader()
+    suite = unittest.TestSuite()
+
+    # Load all of the tests into the suite
+    suite.addTests(loader.loadTestsFromTestCase(UT_validate_add_and.TestValidateAddAnd))
+
+    return suite
+
 # ==============================================================================
 # Name: main
 # Purpose: When called, loads all of the unit tests and then runs them.
 # ==============================================================================
 def main():
     # Generate the test suites
-    suite_parse_lib = parselib_Tests()
+    suite_parselib = parselib_Tests()
     suite_utils = utils_Tests()
+    suite_validation_lib = validlib_Tests()
 
     # Run the tests using TextTestRunner
     runner = unittest.TextTestRunner()
-    print("\n --- Running parselib unit tests ---")
-    runner.run(suite_parse_lib)
-    print("\n --- Running utils unit tests ---")
-    runner.run(suite_utils)
+    # print("\n --- Running parselib unit tests ---")
+    # runner.run(suite_parselib)
+    # print("\n --- Running utils unit tests ---")
+    # runner.run(suite_utils)
+    print("\n --- Running validationlib unit tests ---")
+    runner.run(suite_validation_lib)

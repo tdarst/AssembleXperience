@@ -28,7 +28,7 @@ def parse_add_or_and(address: str, tokens: dict, label_lookup: dict) -> str:
 
     elif utils.is_imm5(OP3):
         bin_OP3 = '1'
-        bin_OP3 += utils.imm5_to_bin(OP3).zfill(5)
+        bin_OP3 += utils.hash_to_bin(OP3).zfill(5)
 
     bin_string = bin_opcode + bin_OP1 + bin_OP2 + bin_OP3
 
@@ -89,7 +89,7 @@ def parse_ldr_str(address: str, tokens: dict, label_lookup: dict) -> str:
     bin_string = bin_opcode + bin_OP1 + bin_OP2
 
     if utils.is_imm5(OP3):
-        bin_OP3 = utils.imm5_to_bin(OP3).zfill(6)
+        bin_OP3 = utils.hash_to_bin(OP3).zfill(6)
         bin_string += bin_OP3
 
     else:
@@ -230,8 +230,13 @@ def parse_orig(address: str, tokens: dict, label_lookup: dict) -> str:
 # ===============================================================================
 def parse_fill(address: str, tokens: dict, label_lookup: dict) -> str:
     operands = tokens[KEY_OPERANDS]
-    imm5_val = operands[0]
-    bin_val = utils.int_to_bin(utils.imm5_to_int(imm5_val))
+    num_val = operands[0]
+
+    if utils.is_hex(num_val):
+        bin_val = utils.hex_to_bin(num_val)
+    
+    elif utils.is_imm5(num_val):
+        bin_val = utils.hash_to_bin(num_val)
 
     bin_string = bin_val.zfill(MAX_LINE_LENGTH)
 
@@ -244,7 +249,7 @@ def parse_fill(address: str, tokens: dict, label_lookup: dict) -> str:
 # ===============================================================================
 def parse_blkw(address: str, tokens: dict, label_lookup: dict) -> str:
     operand = tokens[KEY_OPERANDS][0]
-    imm5_val = utils.imm5_to_int(operand)
+    imm5_val = utils.hash_to_int(operand)
     bin_string = ''
     for i in range(0, imm5_val-1):
         bin_string += ''.zfill(MAX_LINE_LENGTH) + '\n'
@@ -389,6 +394,15 @@ PARSE_DICT = {
     'BRnp' : parse_br,
     'BRzp' : parse_br,
     'BRnzp': parse_br,
+
+    'BR'   : parse_br,
+    'BRN'  : parse_br,
+    'BRZ'  : parse_br,
+    'BRP'  : parse_br,
+    'BRNZ' : parse_br,
+    'BRNP' : parse_br,
+    'BRZP' : parse_br,
+    'BRNZP': parse_br,
 
     'ADD' : parse_add,
     'LD'  : parse_ld,

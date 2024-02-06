@@ -1,3 +1,5 @@
+import re
+
 IMM5_INT_RANGE = range(-16, 16)
 OFFSET6_INT_RANGE = range(-32, 32)
 
@@ -41,6 +43,15 @@ OPCODE = {
     'BRnp' : 0x0,
     'BRzp' : 0x0,
     'BRnzp': 0x0,
+
+    'BR'   : 0x0,
+    'BRN'  : 0x0,
+    'BRZ'  : 0x0,
+    'BRP'  : 0x0,
+    'BRNZ' : 0x0,
+    'BRNP' : 0x0,
+    'BRZP' : 0x0,
+    'BRNZP': 0x0,
 
     'ADD' : 0x1,
     'LD'  : 0x2,
@@ -90,6 +101,12 @@ KEY_OPCODE = 'opcode'
 KEY_OPERANDS = 'operands'
 KEY_LABELS = 'labels'
 
+def in_range(num: int, val_range: range) -> bool:
+    try:
+        return num in val_range
+    except:
+        return False
+
 # ==============================================================================
 # Name: int_to_bin
 # Purpose: returns the POSITIVE binary string for a given int
@@ -98,21 +115,21 @@ def int_to_bin(num: int) -> str:
     return bin(num)[2:] if num >= 0 else bin(num)[3:]
 
 # ==============================================================================
-# Name: imm5_to_int
+# Name: hash_to_int
 # Purpose: returns the int value for a given imm5.
 # ==============================================================================
-def imm5_to_int(imm_str: str) -> int:
+def hash_to_int(imm_str: str) -> int:
     return int(imm_str.replace('#', ''))
 
 # ==============================================================================
-# Name: imm5_to_int
+# Name: hash_to_bin
 # Purpose: returns the binary value for a given imm5.
 # ==============================================================================
-def imm5_to_bin(imm_str: str) -> str:
-    return int_to_bin(imm5_to_int(imm_str))
+def hash_to_bin(imm_str: str) -> str:
+    return int_to_bin(hash_to_int(imm_str))
 
 # ==============================================================================
-# Name: imm5_to_int
+# Name: hex_to_int
 # Purpose: returns the int value for a given hex.
 # ==============================================================================
 def hex_to_int(hex_str: str) -> int:
@@ -120,10 +137,17 @@ def hex_to_int(hex_str: str) -> int:
 
 # ==============================================================================
 # Name: hex_to_bin
-# Purpose: returns the hex value for a given bin
+# Purpose: returns the bin value for a given hex
 # ==============================================================================
 def hex_to_bin(hex_str: str) -> str:
     return int_to_bin(hex_to_int(hex_str))
+
+# ==============================================================================
+# Name: bin_to_int
+# Purpose: returns the int value for a given bin
+# ==============================================================================
+def bin_to_int(bin_str: str) -> str:
+    return int(bin_str, 2)
 
 # ==============================================================================
 # Name: is_register
@@ -131,6 +155,14 @@ def hex_to_bin(hex_str: str) -> str:
 # ==============================================================================
 def is_register(tok: str) -> bool:
     return tok in REGISTERS
+
+# ==============================================================================
+# Name: is_bin
+# Purpose: returns True if token is a valid binary string, False otherwise.
+# ==============================================================================
+def is_bin(tok: str) -> bool:
+    hex_pattern = re.compile(r'^[01]+$')
+    return bool(hex_pattern.match(tok))
 
 # ==============================================================================
 # Name: is_imm5
@@ -144,6 +176,15 @@ def is_imm5(tok: str) -> bool:
         isImm5 = False
 
     return isImm5
+
+# ==============================================================================
+# Name: is_hash
+# Purpose: returns True if token is a valid hash number value, False otherwise.
+#          example: #5 or #1000 should return true, #asdaf or 10 should not.
+# ==============================================================================
+def is_hash(tok: str) -> bool:
+    hash_pattern = re.compile(r'^#[0-9]*$')
+    return bool(hash_pattern.match(tok))
 
 # ==============================================================================
 # Name: is_label
@@ -166,6 +207,14 @@ def is_offset6(tok: str) -> bool:
         isOffset6 = False
     
     return isOffset6
+
+# ==============================================================================
+# Name: is_hex
+# Purpose: returns True if token is a valid hex value, False
+# ==============================================================================
+def is_hex(tok: str) -> bool:
+    hex_pattern = re.compile(r'^0x[0-9a-fA-F]+$')
+    return bool(hex_pattern.match(tok))
 
 # ==============================================================================
 # Name: calc_twos_complement
