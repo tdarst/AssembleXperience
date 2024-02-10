@@ -167,9 +167,9 @@ def main():
 
     # Run the tests using TextTestRunner
     runner = unittest.TextTestRunner()
-    # print("\n --- Running parselib unit tests ---")
-    # runner.run(suite_parselib)
-    # print("\n --- Running utils unit tests ---")
-    # runner.run(suite_utils)
+    print("\n --- Running parselib unit tests ---")
+    runner.run(suite_parselib)
+    print("\n --- Running utils unit tests ---")
+    runner.run(suite_utils)
     print("\n --- Running validationlib unit tests ---")
     runner.run(suite_validation_lib)

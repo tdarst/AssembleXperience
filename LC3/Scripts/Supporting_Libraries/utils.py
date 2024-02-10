@@ -11,6 +11,8 @@ STRINGZ_INT_RANGE = range(0, 501)
 RET_BIN_STRING = '1100000111000000'
 RTI_BIN_STRING = '1000000000000000'
 
+ORIG_OPCODE_NAME = '.ORIG'
+
 # Length: 3 bits
 # Dictioanry of all registers and their vectors.
 REGISTERS = {
