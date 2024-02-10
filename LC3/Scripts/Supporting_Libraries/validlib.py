@@ -58,7 +58,7 @@ def valid_jmp_jsrr(tokens: dict, label_lookup: dict) -> str or None:
         OP1 = operands[0]
 
         if not utils.is_register(OP1):
-            error_str = ERROR_OPERAND_LENGTH_STR(OP1)
+            error_str = ERROR_OPERAND_TYPE_STR(OP1)
 
     else:
         error_str = ERROR_OPERAND_LENGTH_STR(req_ops_len, ops_len)
@@ -76,7 +76,7 @@ def valid_ld_ldi_lea(tokens: dict, label_lookup: dict) -> str or None:
         OP2 = operands[1]
 
         if not utils.is_register(OP1):
-            error_str = ERROR_OPERAND_LENGTH_STR(OP1)
+            error_str = ERROR_OPERAND_TYPE_STR(OP1)
         
         elif not utils.is_label(OP2, label_lookup):
             error_str = ERROR_OPERAND_INVALID_LABEL(OP2)
@@ -132,7 +132,7 @@ def valid_st_sti(tokens: dict, label_lookup: dict) -> str or None:
 
     return error_str
 
-def valid_ret_rti_end(tokens: dict, label_lookup: dict) -> str or None:
+def valid_ret_rti_end_explicit_trap(tokens: dict, label_lookup: dict) -> str or None:
     error_str = None
     operands = tokens[KEY_OPERANDS]
     req_ops_len = 0
@@ -141,24 +141,7 @@ def valid_ret_rti_end(tokens: dict, label_lookup: dict) -> str or None:
     
     return error_str
 
-def valid_br(tokens: dict, label_lookup: dict) -> str or None:
-    error_str = None
-    operands = tokens[KEY_OPERANDS]
-    ops_len = len(operands)
-    req_ops_len = 1
-
-    if ops_len == req_ops_len:
-        OP1 = operands[0]
-
-        if not utils.is_label(OP1, label_lookup):
-            error_str = ERROR_OPERAND_INVALID_LABEL(OP1)
-
-    else:
-        error_str = ERROR_OPERAND_LENGTH_STR(req_ops_len, ops_len)
-
-    return error_str
-
-def valid_jsr(tokens: dict, label_lookup: dict) -> str or None:
+def valid_jsr_br(tokens: dict, label_lookup: dict) -> str or None:
     error_str = None
     operands = tokens[KEY_OPERANDS]
     ops_len = len(operands)
@@ -213,17 +196,6 @@ def valid_trap(tokens: dict, label_lookup: dict) -> str or None:
 
     return error_str
 
-def valid_explicit_trap(tokens: dict, label_lookup: dict) -> str or None:
-    error_str = None
-    operands = tokens[KEY_OPERANDS]
-    ops_len = len(operands)
-    req_ops_len = 0
-
-    if not ops_len == req_ops_len:
-        error_str = ERROR_OPERAND_LENGTH_STR(req_ops_len, ops_len)
-
-    return error_str
-
 def valid_orig(tokens: dict, label_lookup: dict) -> str or None:
     error_str = None
     operands = tokens[KEY_OPERANDS]
@@ -241,9 +213,7 @@ def valid_orig(tokens: dict, label_lookup: dict) -> str or None:
 
     return error_str
 
-# TODO: poorly written function, needs refactoring
 def valid_fill(tokens: dict, label_lookup: dict) -> str or None:
-    fill_val_range = range(-32768, 32768)
     error_str = None
     operands = tokens[KEY_OPERANDS]
     ops_len = len(operands)
@@ -258,17 +228,11 @@ def valid_fill(tokens: dict, label_lookup: dict) -> str or None:
             utils.is_bin(OP1)
         ]
 
-        val_conditions = [
-            utils.in_range(utils.hex_to_int(OP1), fill_val_range),
-            utils.in_range(utils.hash_to_int(OP1), fill_val_range),
-            utils.in_range(utils.bin_to_int(OP1), fill_val_range)
-        ]
-
         if sum(type_conditions) == 0:
             error_str = ERROR_OPERAND_TYPE_STR(OP1)
 
-        elif sum(val_conditions) == 0:
-            error_str = ERROR_OPERAND_VALUE_OUT_OF_RANGE(OP1)
+        elif not utils.is_imm16(OP1):
+            error_str = ERROR_OPERAND_VALUE_OUT_OF_RANGE(OP1, utils.IMM16_INT_RANGE)
 
     else:
         error_str = ERROR_OPERAND_LENGTH_STR(req_ops_len, ops_len)
@@ -276,7 +240,6 @@ def valid_fill(tokens: dict, label_lookup: dict) -> str or None:
     return error_str
 
 def valid_blkw(tokens: dict, label_lookup: dict) -> str or None:
-    fill_val_range = range(1, 501)
     error_str = None
     operands = tokens[KEY_OPERANDS]
     ops_len = len(operands)
@@ -291,17 +254,11 @@ def valid_blkw(tokens: dict, label_lookup: dict) -> str or None:
             utils.is_bin(OP1)
         ]
 
-        val_conditions = [
-            utils.in_range(utils.hex_to_bin(OP1), fill_val_range),
-            utils.in_range(utils.hash_to_int(OP1), fill_val_range),
-            utils.in_range(utils.bin_to_int(OP1), fill_val_range)
-        ]
-
         if sum(type_conditions) == 0:
             error_str = ERROR_OPERAND_TYPE_STR(OP1)
 
-        elif sum(val_conditions) == 0:
-            error_str = ERROR_OPERAND_VALUE_OUT_OF_RANGE(OP1)
+        elif not utils.is_blkw_valid_val(OP1):
+            error_str = ERROR_OPERAND_VALUE_OUT_OF_RANGE(OP1, utils.BLKW_INT_RANGE)
 
     else:
         error_str = ERROR_OPERAND_LENGTH_STR(req_ops_len, ops_len)
@@ -309,21 +266,19 @@ def valid_blkw(tokens: dict, label_lookup: dict) -> str or None:
     return error_str
 
 def valid_stringz(tokens: dict, label_lookup: dict) -> str or None:
-    stringz_val_range = range(1, 501)
     error_str = None
     operands = tokens[KEY_OPERANDS]
     given_str = ' '.join(operands) if operands else None
-    ops_len = len(operands)
     req_ops_len = 1
 
     if not (operands[0].startswith('"') and operands[-1].endswith('"')):
         error_str = ERROR_OPERAND_INVALID_STRING_NOT_ENCLOSED
 
     elif not given_str:
-        error_str = ERROR_OPERAND_LENGTH_STR(given_str)
+        error_str = ERROR_OPERAND_LENGTH_STR(req_ops_len, 0)
 
-    elif not utils.in_range(len(given_str), stringz_val_range):
-        error_str = ERROR_OPERAND_INVALID_STRING_LENGTH(len(given_str), stringz_val_range)
+    elif not utils.in_range(len(given_str), utils.STRINGZ_INT_RANGE):
+        error_str = ERROR_OPERAND_INVALID_STRING_LENGTH(len(given_str), utils.STRINGZ_INT_RANGE)
 
     return error_str
 
@@ -338,6 +293,12 @@ def valid_jmp(tokens: dict, label_lookup: dict) -> str or None:
 
 def valid_jsrr(tokens: dict, label_lookup: dict) -> str or None:
     return valid_jmp_jsrr(tokens, label_lookup)
+
+def valid_jsr(tokens: dict, label_lookup: dict) -> str or None:
+    return valid_jsr_br(tokens, label_lookup)
+
+def valid_br(tokens: dict, label_lookup: dict) -> str or None:
+    return valid_jsr_br(tokens, label_lookup)
 
 def valid_ld(tokens: dict, label_lookup: dict) -> str or None:
     return valid_ld_ldi_lea(tokens, label_lookup)
@@ -355,19 +316,22 @@ def valid_lea(tokens: dict, label_lookup: dict) -> str or None:
     return valid_ld_ldi_lea(tokens, label_lookup)
 
 def valid_ret(tokens: dict, label_lookup: dict) -> str or None:
-    return valid_ret_rti_end(tokens, label_lookup)
+    return valid_ret_rti_end_explicit_trap(tokens, label_lookup)
 
 def valid_rti(tokens: dict, label_lookup: dict) -> str or None:
-    return valid_ret_rti_end(tokens, label_lookup)
+    return valid_ret_rti_end_explicit_trap(tokens, label_lookup)
+
+def valid_explicit_trap(tokens: dict, label_lookup: dict) -> str or None:
+    return valid_ret_rti_end_explicit_trap(tokens, label_lookup)
+
+def valid_end(tokens: dict, label_lookup: dict) -> str or None:
+    return valid_ret_rti_end_explicit_trap(tokens, label_lookup)
 
 def valid_st(tokens: dict, label_lookup: dict) -> str or None:
     return valid_st_sti(tokens, label_lookup)
 
 def valid_sti(tokens: dict, label_lookup: dict) -> str or None:
     return valid_st_sti(tokens, label_lookup)
-
-def valid_end(tokens: dict, label_lookup: dict) -> str or None:
-    return valid_ret_rti_end(tokens, label_lookup)
     
 # VALID_DICT is used to map all opcode tokens to their respective validation functions
 VALID_DICT = {
@@ -392,7 +356,7 @@ VALID_DICT = {
     'ADD' : valid_and,
     'LD'  : valid_ld,
     'ST'  : valid_st,
-    'JSR' : valid_jsr,
+    'JSR' : valid_jsr_br,
     'JSRR': valid_jsrr,
     'AND' : valid_and,
     'LDR' : valid_ldr,

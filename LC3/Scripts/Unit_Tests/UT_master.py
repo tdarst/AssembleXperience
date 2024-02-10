@@ -26,6 +26,8 @@ from .Unit_Tests_parselib import (UT_parse_add,
 from .Unit_Tests_utils import (UT_int_to_bin,
                                UT_hash_to_int,
                                UT_hash_to_bin,
+                               UT_imm5_to_bin,
+                               UT_imm5_to_int,
                                UT_hex_to_int,
                                UT_hex_to_bin,
                                UT_is_register,
@@ -37,7 +39,27 @@ from .Unit_Tests_utils import (UT_int_to_bin,
                                UT_calc_offset11,
                                UT_get_nzp_bin_string)
 
-from .Unit_Tests_validlib import (UT_validate_add_and)
+from .Unit_Tests_validlib import (UT_valid_add,
+                                  UT_valid_and,
+                                  UT_valid_jmp,
+                                  UT_valid_jsrr,
+                                  UT_valid_ld,
+                                  UT_valid_ldi,
+                                  UT_valid_lea,
+                                  UT_valid_ldr,
+                                  UT_valid_st,
+                                  UT_valid_sti,
+                                  UT_valid_ret,
+                                  UT_valid_rti,
+                                  UT_valid_end,
+                                  UT_valid_br,
+                                  UT_valid_jsr,
+                                  UT_valid_not,
+                                  UT_valid_trap,
+                                  UT_valid_explicit_trap,
+                                  UT_valid_orig,
+                                  UT_valid_fill,
+                                  UT_valid_blkw)
 
 # ==============================================================================
 # Name: parselib_Tests
@@ -85,8 +107,9 @@ def utils_Tests():
 
     # Load all of the tests into the suite
     suite.addTests(loader.loadTestsFromTestCase(UT_int_to_bin.TestIntToBin))
-    suite.addTests(loader.loadTestsFromTestCase(UT_hash_to_int.TestImm5ToInt))
-    suite.addTests(loader.loadTestsFromTestCase(UT_hash_to_bin.TestImm5ToBin))
+
+    suite.addTests(loader.loadTestsFromTestCase(UT_hash_to_int.TestHashToInt))
+    suite.addTests(loader.loadTestsFromTestCase(UT_hash_to_bin.TestHashToBin))
     suite.addTests(loader.loadTestsFromTestCase(UT_hex_to_int.TestHexToInt))
     suite.addTests(loader.loadTestsFromTestCase(UT_hex_to_bin.TestHexToBin))
     suite.addTests(loader.loadTestsFromTestCase(UT_is_register.TestIsRegister))
@@ -97,6 +120,8 @@ def utils_Tests():
     suite.addTests(loader.loadTestsFromTestCase(UT_calc_offset9.TestCalcOffset9))
     suite.addTests(loader.loadTestsFromTestCase(UT_calc_offset11.TestCalcOffset11))
     suite.addTests(loader.loadTestsFromTestCase(UT_get_nzp_bin_string.TestGetNzpBinString))
+    suite.addTests(loader.loadTestsFromTestCase(UT_imm5_to_int.TestImm5ToInt))
+    suite.addTests(loader.loadTestsFromTestCase(UT_imm5_to_bin.TestImm5ToBin))
 
     return suite
 
@@ -106,8 +131,28 @@ def validlib_Tests():
     suite = unittest.TestSuite()
 
     # Load all of the tests into the suite
-    suite.addTests(loader.loadTestsFromTestCase(UT_validate_add_and.TestValidateAddAnd))
-
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_add.TestValidAdd))
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_and.TestValidAnd))
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_jmp.TestValidJmp))
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_jsrr.TestValidJsrr))
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_ld.TestValidLd)) 
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_ldi.TestValidLdi)) 
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_lea.TestValidLea)) 
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_ldr.TestValidLdr))
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_st.TestValidSt))
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_sti.TestValidSti))
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_ret.TestValidRet))
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_rti.TestValidRti))
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_end.TestValidEnd))
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_br.TestValidBr))
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_jsr.TestValidJsr))
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_not.TestValidNot))
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_trap.TestValidTrap))
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_explicit_trap.TestValidExplicitTrap))
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_orig.TestValidOrig))
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_fill.TestValidFill))
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_blkw.TestValidBlkw))
+    
     return suite
 
 # ==============================================================================

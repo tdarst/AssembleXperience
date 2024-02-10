@@ -73,6 +73,7 @@ class TestVars():
         self.TOK_FILL = '.FILL'
         self.TOK_BLKW = '.BLKW'
         self.TOK_STRINGZ = '.STRINGZ'
+        self.TOK_END = '.END'
 
         self.TESTER_LABEL_LOOKUP = {}
 

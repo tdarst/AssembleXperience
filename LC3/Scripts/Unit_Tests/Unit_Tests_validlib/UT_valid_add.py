@@ -2,12 +2,16 @@ import unittest
 from ..Unit_Tests_parselib import Class_TestVars_parselib
 from ...Supporting_Libraries import validlib
 
-class TestValidateAddAnd(unittest.TestCase):
+class TestValidAdd(unittest.TestCase):
     
     def setUp(self):
         super().setUp()
         self.test_vars = Class_TestVars_parselib.TestVars()
 
+    # Testing
+    # ADD #1 R1 R2 = error_str
+    # ADD 0x20 R1 R2 = error_str
+    # ADD LOOP R1 R2 = error_str
     def test_Given_WrongOP1_Produce_CorrectErrorString(self):
         test_vars = self.test_vars
 
@@ -27,11 +31,14 @@ class TestValidateAddAnd(unittest.TestCase):
             labels = []
         )
 
-        self.assertEqual(validlib.valid_add_and(symbol_table, []), '#1')
-        self.assertEqual(validlib.valid_add_and(symbol_table2, []), '0x20')
-        self.assertEqual(validlib.valid_add_and(symbol_table3, []), 'LOOP')
+        self.assertEqual(validlib.valid_add(symbol_table, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.TOK_IMM5_1))
+        self.assertEqual(validlib.valid_add(symbol_table2, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.HEX_VAL_0X20))
+        self.assertEqual(validlib.valid_add(symbol_table3, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.TOK_LABEL_LOOP))
 
-    # Testing 
+    # Testing
+    # ADD R1 #1 R2 = error_str
+    # ADD R1 0x20 R2 = error_str
+    # ADD R1 LOOP R2 = error_str
     def test_Given_WrongOP2_Produce_CorrectErrorString(self):
         test_vars = self.test_vars
 
@@ -51,8 +58,19 @@ class TestValidateAddAnd(unittest.TestCase):
             labels = []
         )
 
-        self.assertEqual(validlib.valid_add_and(symbol_table, []), '#1')
-        self.assertEqual(validlib.valid_add_and(symbol_table2, []), '0x20')
-        self.assertEqual(validlib.valid_add_and(symbol_table3, []), 'LOOP')
+        self.assertEqual(validlib.valid_add(symbol_table, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.TOK_IMM5_1))
+        self.assertEqual(validlib.valid_add(symbol_table2, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.HEX_VAL_0X20))
+        self.assertEqual(validlib.valid_add(symbol_table3, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.TOK_LABEL_LOOP))
 
+    # Testing
+    # ADD R1 R1 LOOP = error_str
+    def test_Given_WrongOP3_Produce_CorrectErrorString(self):
+        test_vars = self.test_vars
 
+        symbol_table = test_vars.generate_tester_symbol_table(
+            opcode = test_vars.TOK_ADD,
+            operands=[test_vars.TOK_R1, test_vars.TOK_R1, test_vars.TOK_LABEL_LOOP],
+            labels = []
+        )
+
+        self.assertEqual(validlib.valid_add(symbol_table, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.TOK_LABEL_LOOP))

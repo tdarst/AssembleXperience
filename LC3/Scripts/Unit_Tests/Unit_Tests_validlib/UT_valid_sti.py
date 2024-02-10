@@ -1,0 +1,75 @@
+import unittest
+from ..Unit_Tests_utils import Class_TestVars_utils
+from ...Supporting_Libraries import validlib
+
+class TestValidSti(unittest.TestCase):
+    
+    def setUp(self):
+        super().setUp()
+        self.test_vars = Class_TestVars_utils.TestVars_utils()
+
+    # Testing
+    # STI #1 LOOP = error_str
+    # STI 0x20 LOOP = error_str
+    # STI LOOP LOOP = error_str
+    def test_Given_WrongOP1_Produce_CorrectErrorString(self):
+        test_vars = self.test_vars
+
+        symbol_table = test_vars.generate_tester_symbol_table(
+            opcode = test_vars.TOK_STI,
+            operands = [test_vars.TOK_IMM5_1, test_vars.TOK_LABEL_LOOP],
+            labels = []
+        )
+        symbol_table2 = test_vars.generate_tester_symbol_table(
+            opcode = test_vars.TOK_STI,
+            operands = [test_vars.HEX_VAL_0X20, test_vars.TOK_LABEL_LOOP],
+            labels = []
+        )
+        symbol_table3 = test_vars.generate_tester_symbol_table(
+            opcode = test_vars.TOK_STI,
+            operands = [test_vars.TOK_LABEL_LOOP, test_vars.TOK_LABEL_LOOP],
+            labels = [test_vars.TOK_LABEL_LOOP]
+        )
+
+        self.assertEqual(validlib.valid_sti(symbol_table, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.TOK_IMM5_1))
+        self.assertEqual(validlib.valid_sti(symbol_table2, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.HEX_VAL_0X20))
+        self.assertEqual(validlib.valid_sti(symbol_table3, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.TOK_LABEL_LOOP))
+
+    # Testing
+    # STI R1 R1 = error_str
+    # STI R1 #1 = error_str
+    # STI R1 0X20 = error_str
+    # STI R1 NUM
+    def test_Given_WrongOP2_Produce_CorrectErrorString(self):
+        test_vars = self.test_vars
+
+        label_lookup = test_vars.generate_tester_label_lookup(
+            test_vars.TOK_LABEL_LOOP,
+            test_vars.ADDRESS_0X3000
+        )
+
+        symbol_table = test_vars.generate_tester_symbol_table(
+            opcode = test_vars.TOK_STI,
+            operands = [test_vars.TOK_R1, test_vars.TOK_R1],
+            labels = []
+        )
+        symbol_table2 = test_vars.generate_tester_symbol_table(
+            opcode = test_vars.TOK_STI,
+            operands = [test_vars.TOK_R1, test_vars.TOK_IMM5_1],
+            labels = []
+        )
+        symbol_table3 = test_vars.generate_tester_symbol_table(
+            opcode = test_vars.TOK_STI,
+            operands = [test_vars.TOK_R1, test_vars.HEX_VAL_0X20],
+            labels = []
+        )
+        symbol_table4 = test_vars.generate_tester_symbol_table(
+            opcode = test_vars.TOK_STI,
+            operands = [test_vars.TOK_R1, test_vars.TOK_LABEL_NUM],
+            labels = [test_vars.TOK_LABEL_NUM]
+        )
+
+        self.assertEqual(validlib.valid_sti(symbol_table, []), validlib.ERROR_OPERAND_INVALID_LABEL(test_vars.TOK_R1))
+        self.assertEqual(validlib.valid_sti(symbol_table2, []), validlib.ERROR_OPERAND_INVALID_LABEL(test_vars.TOK_IMM5_1))
+        self.assertEqual(validlib.valid_sti(symbol_table3, []), validlib.ERROR_OPERAND_INVALID_LABEL(test_vars.HEX_VAL_0X20))
+        self.assertEqual(validlib.valid_sti(symbol_table4, label_lookup), validlib.ERROR_OPERAND_INVALID_LABEL(test_vars.TOK_LABEL_NUM))

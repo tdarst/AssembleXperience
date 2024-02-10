@@ -1,12 +1,15 @@
 import re
 
+# Keep in mind the upper limit of range in python is not included
 IMM5_INT_RANGE = range(-16, 16)
 OFFSET6_INT_RANGE = range(-32, 32)
+IMM16_INT_RANGE = range(-32768, 32768)
+BLKW_INT_RANGE = range(1, 501)
+STRINGZ_INT_RANGE = range(0, 501)
 
+# String values for opcodes that only have one possible translation
 RET_BIN_STRING = '1100000111000000'
 RTI_BIN_STRING = '1000000000000000'
-
-ORIG_OPCODE_NAME = '.ORIG'
 
 # Length: 3 bits
 # Dictioanry of all registers and their vectors.
@@ -106,6 +109,11 @@ def in_range(num: int, val_range: range) -> bool:
         return num in val_range
     except:
         return False
+    
+def convert_to_python_hex_format(hex_str: str) -> str:
+    index_found = hex_str.find('x')
+    converted_str = hex_str[:index_found] + '0' + hex_str[index_found:]
+    return converted_str
 
 # ==============================================================================
 # Name: int_to_bin
@@ -133,6 +141,8 @@ def hash_to_bin(imm_str: str) -> str:
 # Purpose: returns the int value for a given hex.
 # ==============================================================================
 def hex_to_int(hex_str: str) -> int:
+    if not '0x' in hex_str:
+        hex_str = convert_to_python_hex_format(hex_str)
     return int(hex_str, 16)
 
 # ==============================================================================
@@ -183,7 +193,7 @@ def is_imm5(tok: str) -> bool:
 #          example: #5 or #1000 should return true, #asdaf or 10 should not.
 # ==============================================================================
 def is_hash(tok: str) -> bool:
-    hash_pattern = re.compile(r'^#[0-9]*$')
+    hash_pattern = re.compile(r'^#-?[0-9]*$')
     return bool(hash_pattern.match(tok))
 
 # ==============================================================================
@@ -211,10 +221,54 @@ def is_offset6(tok: str) -> bool:
 # ==============================================================================
 # Name: is_hex
 # Purpose: returns True if token is a valid hex value, False
+#
+# Supports prefixes: x, 0x, -x, -0x
+# Examples: x3000, 0x3000, -x3000, -0x3000
 # ==============================================================================
 def is_hex(tok: str) -> bool:
-    hex_pattern = re.compile(r'^0x[0-9a-fA-F]+$')
+    hex_pattern = re.compile(r'^-?0?x[0-9a-fA-F]+$')
     return bool(hex_pattern.match(tok))
+
+# ==============================================================================
+# Name: is_imm16
+# Purpose: returns True if token has a valid integer value in the range of
+#          signed 16 bit integers.
+# ==============================================================================
+def is_imm16(tok: str) -> bool:
+    val = None
+    tok_is_imm16 = False
+
+    if is_hex(tok):
+        val = hex_to_int(tok)
+
+    elif is_bin(tok):
+        val = bin_to_int(tok)
+
+    elif is_hash(tok):
+        val = hash_to_int(tok)
+
+    if val and val in IMM16_INT_RANGE:
+        tok_is_imm16 = True
+
+    return tok_is_imm16
+
+def is_blkw_valid_val(tok: str) -> bool:
+    val = None
+    tok_is_valid = False
+
+    if is_hex(tok):
+        val = hex_to_int(tok)
+
+    elif is_bin(tok):
+        val = bin_to_int(tok)
+
+    elif is_hash(tok):
+        val = hash_to_int(tok)
+
+    if val and val in BLKW_INT_RANGE:
+        tok_is_valid = True
+
+    return tok_is_valid
 
 # ==============================================================================
 # Name: calc_twos_complement

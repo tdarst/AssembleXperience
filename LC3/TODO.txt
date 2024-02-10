@@ -1,0 +1,10 @@
+Create Properties file
+
+Unit Testing
+ - validlib not at 100%
+ - utils needs coverage for new functions:
+	- in_range
+	- convert_to_python_hex_format
+ - utils needs additional coverage for changed functions:
+	- is_hex (test for x, and -x prefixes)
+	- hex_to_int (test for x, and -x prefixes)
