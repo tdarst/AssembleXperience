@@ -22,8 +22,8 @@ def validate_labels(labels: list, label_lookup: dict) -> bool: pass
 # Name: validate_add_and
 # Purpose: Determines whether line is a valid use of ADD or AND.
 # ===============================================================================
-def valid_add_and(tokens: dict, label_lookup: dict) -> str or None:
-    error_str = None
+def valid_add_and(tokens: dict, label_lookup: dict) -> str:
+    error_str = ''
     operands = tokens[KEY_OPERANDS]
     ops_len = len(operands)
     req_ops_len = 3
@@ -48,8 +48,8 @@ def valid_add_and(tokens: dict, label_lookup: dict) -> str or None:
     return error_str
     
 
-def valid_jmp_jsrr(tokens: dict, label_lookup: dict) -> str or None:
-    error_str = None
+def valid_jmp_jsrr(tokens: dict, label_lookup: dict) -> str:
+    error_str = ''
     operands = tokens[KEY_OPERANDS]
     ops_len = len(operands)
     req_ops_len = 1
@@ -65,8 +65,8 @@ def valid_jmp_jsrr(tokens: dict, label_lookup: dict) -> str or None:
 
     return error_str
 
-def valid_ld_ldi_lea(tokens: dict, label_lookup: dict) -> str or None:
-    error_str = None
+def valid_ld_ldi_lea(tokens: dict, label_lookup: dict) -> str:
+    error_str = ''
     operands = tokens[KEY_OPERANDS]
     ops_len = len(operands)
     req_ops_len = 2
@@ -86,8 +86,8 @@ def valid_ld_ldi_lea(tokens: dict, label_lookup: dict) -> str or None:
 
     return error_str
 
-def valid_ldr_str(tokens: dict, label_lookup: dict) -> str or None:
-    error_str = None
+def valid_ldr_str(tokens: dict, label_lookup: dict) -> str:
+    error_str = ''
     operands = tokens[KEY_OPERANDS]
     ops_len = len(operands)
     req_ops_len = 3
@@ -111,8 +111,8 @@ def valid_ldr_str(tokens: dict, label_lookup: dict) -> str or None:
 
     return error_str
 
-def valid_st_sti(tokens: dict, label_lookup: dict) -> str or None:
-    error_str = None
+def valid_st_sti(tokens: dict, label_lookup: dict) -> str:
+    error_str = ''
     operands = tokens[KEY_OPERANDS]
     ops_len = len(operands)
     req_ops_len = 2
@@ -132,8 +132,8 @@ def valid_st_sti(tokens: dict, label_lookup: dict) -> str or None:
 
     return error_str
 
-def valid_ret_rti_end_explicit_trap(tokens: dict, label_lookup: dict) -> str or None:
-    error_str = None
+def valid_ret_rti_end_explicit_trap(tokens: dict, label_lookup: dict) -> str:
+    error_str = ''
     operands = tokens[KEY_OPERANDS]
     req_ops_len = 0
     if operands:
@@ -141,8 +141,8 @@ def valid_ret_rti_end_explicit_trap(tokens: dict, label_lookup: dict) -> str or 
     
     return error_str
 
-def valid_jsr_br(tokens: dict, label_lookup: dict) -> str or None:
-    error_str = None
+def valid_jsr_br(tokens: dict, label_lookup: dict) -> str:
+    error_str = ''
     operands = tokens[KEY_OPERANDS]
     ops_len = len(operands)
     req_ops_len = 1
@@ -158,8 +158,8 @@ def valid_jsr_br(tokens: dict, label_lookup: dict) -> str or None:
 
     return error_str
 
-def valid_not(tokens: dict, label_lookup: dict) -> str or None:
-    error_str = None
+def valid_not(tokens: dict, label_lookup: dict) -> str:
+    error_str = ''
     operands = tokens[KEY_OPERANDS]
     ops_len = len(operands)
     req_ops_len = 2
@@ -179,8 +179,8 @@ def valid_not(tokens: dict, label_lookup: dict) -> str or None:
 
     return error_str 
 
-def valid_trap(tokens: dict, label_lookup: dict) -> str or None:
-    error_str = None
+def valid_trap(tokens: dict, label_lookup: dict) -> str:
+    error_str = ''
     operands = tokens[KEY_OPERANDS]
     ops_len = len(operands)
     req_ops_len = 1
@@ -196,8 +196,8 @@ def valid_trap(tokens: dict, label_lookup: dict) -> str or None:
 
     return error_str
 
-def valid_orig(tokens: dict, label_lookup: dict) -> str or None:
-    error_str = None
+def valid_orig(tokens: dict, label_lookup: dict) -> str:
+    error_str = ''
     operands = tokens[KEY_OPERANDS]
     ops_len = len(operands)
     req_ops_len = 1
@@ -213,8 +213,8 @@ def valid_orig(tokens: dict, label_lookup: dict) -> str or None:
 
     return error_str
 
-def valid_fill(tokens: dict, label_lookup: dict) -> str or None:
-    error_str = None
+def valid_fill(tokens: dict, label_lookup: dict) -> str:
+    error_str = ''
     operands = tokens[KEY_OPERANDS]
     ops_len = len(operands)
     req_ops_len = 1
@@ -239,8 +239,8 @@ def valid_fill(tokens: dict, label_lookup: dict) -> str or None:
 
     return error_str
 
-def valid_blkw(tokens: dict, label_lookup: dict) -> str or None:
-    error_str = None
+def valid_blkw(tokens: dict, label_lookup: dict) -> str:
+    error_str = ''
     operands = tokens[KEY_OPERANDS]
     ops_len = len(operands)
     req_ops_len = 1
@@ -265,8 +265,8 @@ def valid_blkw(tokens: dict, label_lookup: dict) -> str or None:
 
     return error_str
 
-def valid_stringz(tokens: dict, label_lookup: dict) -> str or None:
-    error_str = None
+def valid_stringz(tokens: dict, label_lookup: dict) -> str:
+    error_str = ''
     operands = tokens[KEY_OPERANDS]
     given_str = ' '.join(operands) if operands else None
     req_ops_len = 1
@@ -282,55 +282,55 @@ def valid_stringz(tokens: dict, label_lookup: dict) -> str or None:
 
     return error_str
 
-def valid_add(tokens: dict, label_lookup: dict) -> str or None:
+def valid_add(tokens: dict, label_lookup: dict) -> str:
     return valid_add_and(tokens, label_lookup)
 
-def valid_and(tokens: dict, label_lookup: dict) -> str or None:
+def valid_and(tokens: dict, label_lookup: dict) -> str:
     return valid_add_and(tokens, label_lookup)
 
-def valid_jmp(tokens: dict, label_lookup: dict) -> str or None:
+def valid_jmp(tokens: dict, label_lookup: dict) -> str:
     return valid_jmp_jsrr(tokens, label_lookup)
 
-def valid_jsrr(tokens: dict, label_lookup: dict) -> str or None:
+def valid_jsrr(tokens: dict, label_lookup: dict) -> str:
     return valid_jmp_jsrr(tokens, label_lookup)
 
-def valid_jsr(tokens: dict, label_lookup: dict) -> str or None:
+def valid_jsr(tokens: dict, label_lookup: dict) -> str:
     return valid_jsr_br(tokens, label_lookup)
 
-def valid_br(tokens: dict, label_lookup: dict) -> str or None:
+def valid_br(tokens: dict, label_lookup: dict) -> str:
     return valid_jsr_br(tokens, label_lookup)
 
-def valid_ld(tokens: dict, label_lookup: dict) -> str or None:
+def valid_ld(tokens: dict, label_lookup: dict) -> str:
     return valid_ld_ldi_lea(tokens, label_lookup)
 
-def valid_ldi(tokens: dict, label_lookup: dict) -> str or None:
+def valid_ldi(tokens: dict, label_lookup: dict) -> str:
     return valid_ld_ldi_lea(tokens, label_lookup)
 
-def valid_ldr(tokens: dict, label_lookup: dict) -> str or None:
+def valid_ldr(tokens: dict, label_lookup: dict) -> str:
     return valid_ldr_str(tokens, label_lookup)
 
-def valid_str(tokens: dict, label_lookup: dict) -> str or None:
+def valid_str(tokens: dict, label_lookup: dict) -> str:
     return valid_ldr_str(tokens, label_lookup)
 
-def valid_lea(tokens: dict, label_lookup: dict) -> str or None:
+def valid_lea(tokens: dict, label_lookup: dict) -> str:
     return valid_ld_ldi_lea(tokens, label_lookup)
 
-def valid_ret(tokens: dict, label_lookup: dict) -> str or None:
+def valid_ret(tokens: dict, label_lookup: dict) -> str:
     return valid_ret_rti_end_explicit_trap(tokens, label_lookup)
 
-def valid_rti(tokens: dict, label_lookup: dict) -> str or None:
+def valid_rti(tokens: dict, label_lookup: dict) -> str:
     return valid_ret_rti_end_explicit_trap(tokens, label_lookup)
 
-def valid_explicit_trap(tokens: dict, label_lookup: dict) -> str or None:
+def valid_explicit_trap(tokens: dict, label_lookup: dict) -> str:
     return valid_ret_rti_end_explicit_trap(tokens, label_lookup)
 
-def valid_end(tokens: dict, label_lookup: dict) -> str or None:
+def valid_end(tokens: dict, label_lookup: dict) -> str:
     return valid_ret_rti_end_explicit_trap(tokens, label_lookup)
 
-def valid_st(tokens: dict, label_lookup: dict) -> str or None:
+def valid_st(tokens: dict, label_lookup: dict) -> str:
     return valid_st_sti(tokens, label_lookup)
 
-def valid_sti(tokens: dict, label_lookup: dict) -> str or None:
+def valid_sti(tokens: dict, label_lookup: dict) -> str:
     return valid_st_sti(tokens, label_lookup)
     
 # VALID_DICT is used to map all opcode tokens to their respective validation functions
@@ -391,8 +391,8 @@ def assemble_line_contents(tokens: dict) -> str:
     return line_contents
 
 
-def validate_line(line: int, tokens: dict, label_lookup: dict) -> str or None:
-    error_str = None
+def validate_line(line: int, tokens: dict, label_lookup: dict) -> str:
+    error_str = ''
     line_contents = assemble_line_contents(tokens)
     try:
         opcode = tokens[KEY_OPCODE]
