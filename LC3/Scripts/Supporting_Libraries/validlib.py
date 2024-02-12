@@ -11,12 +11,11 @@ ERROR_OPCODE_INVALID_OPCODE = lambda given_op: f"Opcode {given_op} does not exis
 ERROR_OPERAND_TYPE_STR = lambda op: f"Invalid operand {op}"
 ERROR_OPERAND_LENGTH_STR = lambda req_len, op_len : f"Should be {req_len} operands, but {op_len} given"
 ERROR_OPERAND_INVALID_LABEL = lambda label: f"Label {label} is invalid"
+
 ERROR_OPERAND_INVALID_TRAP_VECTOR = lambda vector: f"Trap vector {vector} is invalid"
 ERROR_OPERAND_VALUE_OUT_OF_RANGE = lambda value, range: f"Value {value} not in {range}"
 ERROR_OPERAND_INVALID_STRING_NOT_ENCLOSED = "Invalid string given"
 ERROR_OPERAND_INVALID_STRING_LENGTH = lambda length, range: f"String length {length} not in {range}"
-
-def validate_labels(labels: list, label_lookup: dict) -> bool: pass
 
 # ===============================================================================
 # Name: validate_add_and
@@ -383,6 +382,9 @@ VALID_DICT = {
     '.STRINGZ': valid_stringz
 }
 
+def invalid_opcode(opcode: str) -> bool:
+    return not opcode in VALID_DICT.keys()
+
 def assemble_line_contents(tokens: dict) -> str:
     label = tokens[KEY_LABELS]
     opcode = tokens[KEY_OPCODE]
@@ -394,6 +396,7 @@ def assemble_line_contents(tokens: dict) -> str:
 def validate_line(line: int, tokens: dict, label_lookup: dict) -> str:
     error_str = ''
     line_contents = assemble_line_contents(tokens)
+
     try:
         opcode = tokens[KEY_OPCODE]
         valid_func = VALID_DICT[opcode]
