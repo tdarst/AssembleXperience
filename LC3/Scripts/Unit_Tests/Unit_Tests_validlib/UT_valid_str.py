@@ -2,7 +2,7 @@ import unittest
 from ..Unit_Tests_utils import Class_TestVars_utils
 from ...Supporting_Libraries import validlib, utils
 
-class TestValidLdr(unittest.TestCase):
+class TestValidStr(unittest.TestCase):
     
     def setUp(self):
         super().setUp()
@@ -16,24 +16,24 @@ class TestValidLdr(unittest.TestCase):
         test_vars = self.test_vars
 
         symbol_table = test_vars.generate_tester_symbol_table(
-            opcode = test_vars.TOK_LDR,
+            opcode = test_vars.TOK_STR,
             operands = [test_vars.TOK_IMM5_1, test_vars.TOK_R1, test_vars.TOK_IMM5_1],
             labels = []
         )
         symbol_table2 = test_vars.generate_tester_symbol_table(
-            opcode = test_vars.TOK_LDR,
+            opcode = test_vars.TOK_STR,
             operands = [test_vars.HEX_VAL_0X20, test_vars.TOK_R1, test_vars.TOK_IMM5_1],
             labels = []
         )
         symbol_table3 = test_vars.generate_tester_symbol_table(
-            opcode = test_vars.TOK_LDR,
+            opcode = test_vars.TOK_STR,
             operands = [test_vars.TOK_LABEL_LOOP, test_vars.TOK_R1, test_vars.TOK_IMM5_1],
             labels = []
         )
 
-        self.assertEqual(validlib.valid_ldr(symbol_table, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.TOK_IMM5_1))
-        self.assertEqual(validlib.valid_ldr(symbol_table2, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.HEX_VAL_0X20))
-        self.assertEqual(validlib.valid_ldr(symbol_table3, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.TOK_LABEL_LOOP))
+        self.assertEqual(validlib.valid_str(symbol_table, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.TOK_IMM5_1))
+        self.assertEqual(validlib.valid_str(symbol_table2, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.HEX_VAL_0X20))
+        self.assertEqual(validlib.valid_str(symbol_table3, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.TOK_LABEL_LOOP))
 
     # Testing
     # LDR R1 #1 #1 = error_str
@@ -43,24 +43,24 @@ class TestValidLdr(unittest.TestCase):
         test_vars = self.test_vars
 
         symbol_table = test_vars.generate_tester_symbol_table(
-            opcode = test_vars.TOK_LDR,
+            opcode = test_vars.TOK_STR,
             operands = [test_vars.TOK_R1, test_vars.TOK_IMM5_1, test_vars.TOK_IMM5_1],
             labels = []
         )
         symbol_table2 = test_vars.generate_tester_symbol_table(
-            opcode = test_vars.TOK_LDR,
+            opcode = test_vars.TOK_STR,
             operands = [test_vars.TOK_R1, test_vars.HEX_VAL_0X20, test_vars.TOK_IMM5_1],
             labels = []
         )
         symbol_table3 = test_vars.generate_tester_symbol_table(
-            opcode = test_vars.TOK_LDR,
+            opcode = test_vars.TOK_STR,
             operands = [test_vars.TOK_R1, test_vars.TOK_LABEL_LOOP, test_vars.TOK_IMM5_1],
             labels = [test_vars.TOK_LABEL_LOOP]
         )
 
-        self.assertEqual(validlib.valid_ldr(symbol_table, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.TOK_IMM5_1))
-        self.assertEqual(validlib.valid_ldr(symbol_table2, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.HEX_VAL_0X20))
-        self.assertEqual(validlib.valid_ldr(symbol_table3, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.TOK_LABEL_LOOP))
+        self.assertEqual(validlib.valid_str(symbol_table, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.TOK_IMM5_1))
+        self.assertEqual(validlib.valid_str(symbol_table2, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.HEX_VAL_0X20))
+        self.assertEqual(validlib.valid_str(symbol_table3, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.TOK_LABEL_LOOP))
 
     # Testing
     # LDR R1 R2 #32 = error_str
@@ -70,12 +70,12 @@ class TestValidLdr(unittest.TestCase):
         test_vars = self.test_vars
 
         symbol_table = test_vars.generate_tester_symbol_table(
-            opcode = test_vars.TOK_LDR,
+            opcode = test_vars.TOK_STR,
             operands = [test_vars.TOK_R1, test_vars.TOK_R2, test_vars.fake_offset6_val_32],
             labels = []
         )
         symbol_table2 = test_vars.generate_tester_symbol_table(
-            opcode = test_vars.TOK_LDR,
+            opcode = test_vars.TOK_STR,
             operands = [test_vars.TOK_R1, test_vars.TOK_R2, test_vars.TOK_LABEL_LOOP],
             labels = [test_vars.TOK_LABEL_LOOP]
         )
@@ -85,9 +85,9 @@ class TestValidLdr(unittest.TestCase):
             labels = []
         )
 
-        self.assertEqual(validlib.valid_ldr(symbol_table, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.fake_offset6_val_32))
-        self.assertEqual(validlib.valid_ldr(symbol_table2, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.TOK_LABEL_LOOP))
-        self.assertEqual(validlib.valid_ldr(symbol_table3, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.TOK_R1))
+        self.assertEqual(validlib.valid_str(symbol_table, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.fake_offset6_val_32))
+        self.assertEqual(validlib.valid_str(symbol_table2, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.TOK_LABEL_LOOP))
+        self.assertEqual(validlib.valid_str(symbol_table3, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.TOK_R1))
 
     # TEST
     # 4 operands = error_str
@@ -95,12 +95,12 @@ class TestValidLdr(unittest.TestCase):
         test_vars = self.test_vars
 
         symbol_table = test_vars.generate_tester_symbol_table(
-            opcode = test_vars.TOK_LDR,
+            opcode = test_vars.TOK_STR,
             operands=[test_vars.TOK_R1, test_vars.TOK_R1, test_vars.offset6_val_31, test_vars.offset6_val_31],
             labels = []
         )
 
-        self.assertEqual(validlib.valid_ldr(symbol_table, []), validlib.ERROR_OPERAND_LENGTH_STR(3, len(symbol_table[utils.KEY_OPERANDS]))) 
+        self.assertEqual(validlib.valid_str(symbol_table, []), validlib.ERROR_OPERAND_LENGTH_STR(3, len(symbol_table[utils.KEY_OPERANDS]))) 
 
     # TEST
     # 1 operand = error_str
@@ -108,9 +108,9 @@ class TestValidLdr(unittest.TestCase):
         test_vars = self.test_vars
 
         symbol_table = test_vars.generate_tester_symbol_table(
-            opcode = test_vars.TOK_LDR,
+            opcode = test_vars.TOK_STR,
             operands=[test_vars.TOK_R1],
             labels = []
         )
 
-        self.assertEqual(validlib.valid_ldr(symbol_table, []), validlib.ERROR_OPERAND_LENGTH_STR(3, len(symbol_table[utils.KEY_OPERANDS])))
+        self.assertEqual(validlib.valid_str(symbol_table, []), validlib.ERROR_OPERAND_LENGTH_STR(3, len(symbol_table[utils.KEY_OPERANDS])))

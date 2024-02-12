@@ -1,6 +1,6 @@
 import unittest
 from ..Unit_Tests_parselib import Class_TestVars_parselib
-from ...Supporting_Libraries import validlib
+from ...Supporting_Libraries import validlib, utils
 
 class TestValidAnd(unittest.TestCase):
     
@@ -74,3 +74,25 @@ class TestValidAnd(unittest.TestCase):
         )
 
         self.assertEqual(validlib.valid_and(symbol_table, []), validlib.ERROR_OPERAND_TYPE_STR(test_vars.TOK_LABEL_LOOP))
+
+    def test_Given_TooManyOperands_Produce_CorrectErrorString(self):
+        test_vars = self.test_vars
+
+        symbol_table = test_vars.generate_tester_symbol_table(
+            opcode = test_vars.TOK_AND,
+            operands=[test_vars.TOK_R1, test_vars.TOK_R1, test_vars.TOK_R1, test_vars.TOK_LABEL_LOOP],
+            labels = []
+        )
+
+        self.assertEqual(validlib.valid_add(symbol_table, []), validlib.ERROR_OPERAND_LENGTH_STR(3, len(symbol_table[utils.KEY_OPERANDS]))) 
+
+    def test_Given_TooFewOperands_Produce_CorrectErrorString(self):
+        test_vars = self.test_vars
+
+        symbol_table = test_vars.generate_tester_symbol_table(
+            opcode = test_vars.TOK_AND,
+            operands=[test_vars.TOK_R1, test_vars.TOK_R1],
+            labels = []
+        )
+
+        self.assertEqual(validlib.valid_add(symbol_table, []), validlib.ERROR_OPERAND_LENGTH_STR(3, len(symbol_table[utils.KEY_OPERANDS])))

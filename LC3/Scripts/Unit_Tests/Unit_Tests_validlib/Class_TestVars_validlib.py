@@ -25,6 +25,8 @@ class TestVars_validlib(Class_TestVars_parselib.TestVars):
         self.fake_stringz_no_right_quote = '"ASDF'
         self.fake_stringz_no_left_quote = 'ASDF"'
 
+        self.TOK_TRAP_VECTOR_0X22 = 0x22
+
         self.range_imm16 = utils.IMM16_INT_RANGE
         self.range_blkw = utils.BLKW_INT_RANGE
         self.range_stringz = utils.STRINGZ_INT_RANGE

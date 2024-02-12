@@ -188,7 +188,7 @@ def valid_trap(tokens: dict, label_lookup: dict) -> str:
     if ops_len == req_ops_len:
         OP1 = operands[0]
 
-        if OP1 not in utils.TRAPS.values():
+        if not OP1 in utils.TRAPS.values():
             error_str = ERROR_OPERAND_INVALID_TRAP_VECTOR(OP1)
 
     else:

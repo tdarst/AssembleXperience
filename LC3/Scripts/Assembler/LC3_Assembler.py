@@ -172,13 +172,13 @@ def pass2(symbol_table, label_lookup):
     machine_code = ''
     error_string = ''
     for line_number, tokens in symbol_table.items():
-        # error_string = validlib.validate_line(line_number, tokens, label_lookup)
-        # if not error_string:
-        #     opcode = tokens[KEY_OPCODE]
-        #     bin_string = parselib.PARSE_DICT[opcode](tokens['address'], tokens, label_lookup)
-        # else:
-        #     print(error_string)
-        #     return error_string
+        error_string = validlib.validate_line(line_number, tokens, label_lookup)
+        if not error_string:
+            opcode = tokens[KEY_OPCODE]
+            bin_string = parselib.PARSE_DICT[opcode](tokens['address'], tokens, label_lookup)
+        else:
+            print(error_string)
+            return error_string
         
         opcode = tokens[KEY_OPCODE]
         bin_string = parselib.PARSE_DICT[opcode](tokens['address'], tokens, label_lookup)
@@ -199,8 +199,8 @@ def main(asm_path):
             readLines = asm_file.read()
 
         symbol_table, label_lookup = pass1(readLines)
-        print(symbol_table)
         machine_code = pass2(symbol_table, label_lookup)
+        print(machine_code)
 
         local_path = os.getcwd()
         bin_output_path = os.path.join(local_path, "LC3_Bin_Files")
@@ -210,10 +210,13 @@ def main(asm_path):
         file_name = os.path.split(asm_path)[1]
         local_file_path = os.path.join(bin_output_path, f"{file_name.split('.')[0]}.bin")
 
+        if os.path.exists(local_file_path):
+            os.remove(local_file_path)
+
         with open(local_file_path, 'w') as local_file:
             local_file.write(machine_code)
 
-        print("OUTPUT COMPLETED - file can be found in LOCALAPPDATA LC3_Bin_Files folder.")
+        print(f"OUTPUT COMPLETED - file can be found at {local_file_path}")
 
     else:
         print("LC3_Assembler, no file path given")

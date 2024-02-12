@@ -47,6 +47,7 @@ from .Unit_Tests_validlib import (UT_valid_add,
                                   UT_valid_ldi,
                                   UT_valid_lea,
                                   UT_valid_ldr,
+                                  UT_valid_str,
                                   UT_valid_st,
                                   UT_valid_sti,
                                   UT_valid_ret,
@@ -139,6 +140,7 @@ def validlib_Tests():
     suite.addTests(loader.loadTestsFromTestCase(UT_valid_ldi.TestValidLdi)) 
     suite.addTests(loader.loadTestsFromTestCase(UT_valid_lea.TestValidLea)) 
     suite.addTests(loader.loadTestsFromTestCase(UT_valid_ldr.TestValidLdr))
+    suite.addTests(loader.loadTestsFromTestCase(UT_valid_str.TestValidStr))
     suite.addTests(loader.loadTestsFromTestCase(UT_valid_st.TestValidSt))
     suite.addTests(loader.loadTestsFromTestCase(UT_valid_sti.TestValidSti))
     suite.addTests(loader.loadTestsFromTestCase(UT_valid_ret.TestValidRet))
@@ -163,7 +165,7 @@ def main():
     # Generate the test suites
     suite_parselib = parselib_Tests()
     suite_utils = utils_Tests()
-    suite_validation_lib = validlib_Tests()
+    suite_validlib = validlib_Tests()
 
     # Run the tests using TextTestRunner
     runner = unittest.TextTestRunner()
@@ -171,5 +173,5 @@ def main():
     runner.run(suite_parselib)
     print("\n --- Running utils unit tests ---")
     runner.run(suite_utils)
-    print("\n --- Running validationlib unit tests ---")
-    runner.run(suite_validation_lib)
+    print("\n --- Running validlib unit tests ---")
+    runner.run(suite_validlib)

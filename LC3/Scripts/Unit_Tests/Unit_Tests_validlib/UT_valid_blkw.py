@@ -1,6 +1,6 @@
 import unittest
 from ..Unit_Tests_validlib import Class_TestVars_validlib
-from ...Supporting_Libraries import validlib
+from ...Supporting_Libraries import validlib, utils
 
 class TestValidBlkw(unittest.TestCase):
     
@@ -62,3 +62,29 @@ class TestValidBlkw(unittest.TestCase):
         self.assertEqual(validlib.valid_blkw(symbol_table5, []), validlib.ERROR_OPERAND_VALUE_OUT_OF_RANGE(test_vars.fake_blkw_hex_past_upper_limit, test_vars.range_blkw))
         self.assertEqual(validlib.valid_blkw(symbol_table6, []), validlib.ERROR_OPERAND_VALUE_OUT_OF_RANGE(test_vars.fake_blkw_bin_past_upper_limit, test_vars.range_blkw))
         self.assertEqual(validlib.valid_blkw(symbol_table7, []), validlib.ERROR_OPERAND_VALUE_OUT_OF_RANGE(test_vars.fake_blkw_hash_past_upper_limit, test_vars.range_blkw))
+
+    # TEST
+    # 2 operands = error_str
+    def test_Given_TooManyOperands_Produce_CorrectErrorString(self):
+        test_vars = self.test_vars
+
+        symbol_table = test_vars.generate_tester_symbol_table(
+            opcode = test_vars.TOK_BLKW,
+            operands=[test_vars.HEX_VAL_0X20, test_vars.TOK_R1],
+            labels = []
+        )
+
+        self.assertEqual(validlib.valid_blkw(symbol_table, []), validlib.ERROR_OPERAND_LENGTH_STR(1, len(symbol_table[utils.KEY_OPERANDS]))) 
+
+    # TEST
+    # 0 operand = error_str
+    def test_Given_TooFewOperands_Produce_CorrectErrorString(self):
+        test_vars = self.test_vars
+
+        symbol_table = test_vars.generate_tester_symbol_table(
+            opcode = test_vars.TOK_BLKW,
+            operands=[],
+            labels = []
+        )
+
+        self.assertEqual(validlib.valid_blkw(symbol_table, []), validlib.ERROR_OPERAND_LENGTH_STR(1, len(symbol_table[utils.KEY_OPERANDS])))
