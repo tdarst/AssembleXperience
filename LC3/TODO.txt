@@ -1,7 +1,7 @@
-Create Properties file
+Create Properties file?
+Create Diagram of Library Architecture for presentation.
 
 Unit Testing
- - validlib not at 100%
  - utils needs coverage for new functions:
 	- in_range
 	- convert_to_python_hex_format
