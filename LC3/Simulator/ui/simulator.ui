@@ -23,11 +23,11 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="Simulate_Tab">
     <attribute name="title">
-     <string>Tab 1</string>
+     <string>Simulate</string>
     </attribute>
     <widget class="QTextBrowser" name="Simulate_RegistersTextBrowser">
      <property name="geometry">
@@ -165,7 +165,7 @@
    </widget>
    <widget class="QWidget" name="Edit_Tab">
     <attribute name="title">
-     <string>Tab 2</string>
+     <string>Edit</string>
     </attribute>
     <widget class="QTextEdit" name="Edit_EditorTextEditor">
      <property name="geometry">

@@ -5,6 +5,8 @@ from PyQt5 import uic
 from asyncqt import QEventLoop, asyncSlot
 from ..Assembler import LC3_Assembler
 
+LINE_TIMER_TIME = 50
+
 class AssembleXperience(QWidget):
     def __init__(self):
         super().__init__()
@@ -13,11 +15,13 @@ class AssembleXperience(QWidget):
         # Load the UI file
         uic.loadUi(path + "\\simulator.ui", self)
         
+        self.init_timers()
         self.init_widget_settings()
         self.init_variables()
         self.init_actions()
-        self.init_timers()
         
+        self.change_state()
+             
         # Show the widget
         self.show()
         
@@ -29,15 +33,16 @@ class AssembleXperience(QWidget):
         self.populate_registers()
         self.populate_line_numbers()
         
+        self.Application_TabWidget.currentChanged.connect(self.change_state)
+        
         self.Edit_NewButton.clicked.connect(self.clear_editor)
         self.Edit_SaveButton.clicked.connect(self.save_editor)
         self.Edit_LoadButton.clicked.connect(self.load_editor)
         self.Edit_AssembleButton.clicked.connect(self.assemble_editor)
         
     def init_timers(self) -> None:
-        self.line_timer = QTimer()
-        self.line_timer.timeout.connect(self.populate_line_numbers)
-        self.line_timer.start(50)
+        self.editor_line_timer = QTimer()
+        self.editor_line_timer.timeout.connect(self.populate_line_numbers)
         
     def init_variables(self) -> None:
         self.registers_dict = {
@@ -53,7 +58,24 @@ class AssembleXperience(QWidget):
             'MSR': '0'
         }
         
+        self.states = {
+            '0': self.state_simulate,
+            '1': self.state_edit
+        }
+        self.currentState = 'simulate'
+        
         self.editor_loaded_file = ''
+        
+    def change_state(self):
+        current_index = str(self.Application_TabWidget.currentIndex())
+        print(current_index)
+        self.states[current_index]()
+        
+    def state_simulate(self):
+        self.editor_line_timer.stop()
+    
+    def state_edit(self):
+        self.editor_line_timer.start(LINE_TIMER_TIME)
         
     def populate_registers(self) -> None:
         self.Simulate_RegistersTextBrowser.clear()
