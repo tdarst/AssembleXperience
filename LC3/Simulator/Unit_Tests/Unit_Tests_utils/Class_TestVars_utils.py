@@ -49,6 +49,7 @@ class TestVars_utils(Class_TestVars_parselib.TestVars):
         self.bin_1101 = '1101'
         self.bin_0011 = '0011'
         self.bin_0000 = '0000'
+        self.bin_1 = '1'
 
 
         self.nonsense = 'alkajsdflkj'

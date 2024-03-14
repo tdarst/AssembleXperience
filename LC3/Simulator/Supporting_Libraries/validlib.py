@@ -225,8 +225,11 @@ def valid_trap(tokens: dict, label_lookup: dict) -> str:
 
     if ops_len == req_ops_len:
         OP1 = operands[0]
-
-        if not utils.hex_to_int(OP1) in utils.TRAPS.values():
+        
+        if not utils.is_hex(OP1):
+            error_str = ERROR_OPERAND_INVALID_TRAP_VECTOR(OP1)
+            
+        elif not utils.hex_to_int(OP1) in utils.TRAPS.values():
             error_str = ERROR_OPERAND_INVALID_TRAP_VECTOR(OP1)
 
     else:

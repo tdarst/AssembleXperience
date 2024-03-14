@@ -30,6 +30,7 @@ from .Unit_Tests_utils import (UT_int_to_bin,
                                UT_imm5_to_int,
                                UT_hex_to_int,
                                UT_hex_to_bin,
+                               UT_bin_to_hash,
                                UT_is_register,
                                UT_is_imm5,
                                UT_is_label,
@@ -61,6 +62,8 @@ from .Unit_Tests_validlib import (UT_valid_add,
                                   UT_valid_orig,
                                   UT_valid_fill,
                                   UT_valid_blkw)
+
+from .Unit_Tests_disaslib import (UT_disas_add)
 
 # ==============================================================================
 # Name: parselib_Tests
@@ -113,6 +116,7 @@ def utils_Tests():
     suite.addTests(loader.loadTestsFromTestCase(UT_hash_to_bin.TestHashToBin))
     suite.addTests(loader.loadTestsFromTestCase(UT_hex_to_int.TestHexToInt))
     suite.addTests(loader.loadTestsFromTestCase(UT_hex_to_bin.TestHexToBin))
+    suite.addTests(loader.loadTestsFromTestCase(UT_bin_to_hash.TestBinToHash))
     suite.addTests(loader.loadTestsFromTestCase(UT_is_register.TestIsRegister))
     suite.addTests(loader.loadTestsFromTestCase(UT_is_imm5.TestIsImm5))
     suite.addTests(loader.loadTestsFromTestCase(UT_is_label.TestIsLabel))
@@ -157,6 +161,13 @@ def validlib_Tests():
     
     return suite
 
+def disaslib_Tests():
+    # Create a TestLoader and Suite
+    loader = unittest.TestLoader()
+    suite = unittest.TestSuite()
+    
+    suite.addTests(loader.loadTestsFromTestCase(UT_disas_add.TestDisasAdd))
+
 # ==============================================================================
 # Name: main
 # Purpose: When called, loads all of the unit tests and then runs them.
@@ -166,6 +177,7 @@ def main():
     suite_parselib = parselib_Tests()
     suite_utils = utils_Tests()
     suite_validlib = validlib_Tests()
+    suite_disaslib = disaslib_Tests()
 
     # Run the tests using TextTestRunner
     runner = unittest.TextTestRunner()
@@ -175,3 +187,5 @@ def main():
     runner.run(suite_utils)
     print("\n --- Running validlib unit tests ---")
     runner.run(suite_validlib)
+    print("\n --- Running disaslib unit tests ---")
+    runner.run(suite_disaslib)

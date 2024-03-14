@@ -23,17 +23,7 @@ REGISTERS = {
     'R4':0x4,
     'R5':0x5,
     'R6':0x6,
-    'R7':0x7,
-    
-    
-    'r0':0x0,
-    'r1':0x1,
-    'r2':0x2,
-    'r3':0x3,
-    'r4':0x4,
-    'r5':0x5,
-    'r6':0x6,
-    'r7':0x7
+    'R7':0x7
 }
 
 # Length: 8 bits
@@ -171,6 +161,14 @@ def hex_to_bin(hex_str: str) -> str:
 # ==============================================================================
 def bin_to_int(bin_str: str) -> str:
     return int(bin_str, 2)
+
+# ==============================================================================
+# Name: bin_to_imm5
+# Purpose: returns imm5 assembly representation from given bin string.
+# ==============================================================================
+def bin_to_hash(bin_str: str) -> str:
+    int_val = bin_to_int(bin_str)
+    return f"#{int_val}"
 
 # ==============================================================================
 # Name: is_register
