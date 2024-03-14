@@ -226,7 +226,7 @@ def valid_trap(tokens: dict, label_lookup: dict) -> str:
     if ops_len == req_ops_len:
         OP1 = operands[0]
 
-        if not OP1 in utils.TRAPS.values():
+        if not utils.hex_to_int(OP1) in utils.TRAPS.values():
             error_str = ERROR_OPERAND_INVALID_TRAP_VECTOR(OP1)
 
     else:
@@ -510,7 +510,8 @@ VALID_DICT = {
     '.END' : valid_end,
     '.FILL': valid_fill,
     '.BLKW': valid_blkw,
-    '.STRINGZ': valid_stringz
+    '.STRINGZ': valid_stringz,
+    
 }
 
 # ===============================================================================
@@ -531,15 +532,16 @@ def assemble_line_contents(tokens: dict) -> str:
 # ===============================================================================
 def validate_line(line: int, tokens: dict, label_lookup: dict) -> str:
     error_str = ''
+    line = line
     line_contents = assemble_line_contents(tokens)
     opcode = tokens[KEY_OPCODE]
 
-    try:
-        opcode = tokens[KEY_OPCODE]
-        valid_func = VALID_DICT[opcode]
+    valid_func = utils.lookup_all_caps(opcode, VALID_DICT)
+    
+    if valid_func:
         error = valid_func(tokens, label_lookup)
-    except:
-        error = ERROR_OPCODE_INVALID_OPCODE(tokens[KEY_OPCODE])
+    else:
+        error = ERROR_OPCODE_INVALID_OPCODE(opcode)
 
     if error:
         error_str = ERROR_RETURN_TO_ASSEMBLER(line, line_contents, error)

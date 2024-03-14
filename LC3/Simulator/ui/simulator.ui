@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="Simulate_Tab">
     <attribute name="title">
@@ -35,7 +35,7 @@
        <x>190</x>
        <y>30</y>
        <width>271</width>
-       <height>251</height>
+       <height>271</height>
       </rect>
      </property>
     </widget>
@@ -53,9 +53,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>310</y>
+       <y>330</y>
        <width>451</width>
-       <height>511</height>
+       <height>491</height>
       </rect>
      </property>
     </widget>
@@ -65,7 +65,7 @@
        <x>10</x>
        <y>30</y>
        <width>171</width>
-       <height>251</height>
+       <height>271</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="Simulate_ButtonVerticalLayout">
@@ -117,7 +117,7 @@
      <property name="geometry">
       <rect>
        <x>200</x>
-       <y>280</y>
+       <y>300</y>
        <width>91</width>
        <height>31</height>
       </rect>
@@ -218,13 +218,6 @@
        <widget class="QPushButton" name="Edit_SaveButton">
         <property name="text">
          <string>Save</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="Edit_SaveAsButton">
-        <property name="text">
-         <string>Save As</string>
         </property>
        </widget>
       </item>

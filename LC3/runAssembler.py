@@ -1,8 +1,11 @@
-import sys
-from Scripts.Assembler import LC3_Assembler
-
-# Runs the assembler, takes command line argument as path.
-if __name__=='__main__':
-    asm_path = r"C:\Users\trevo\OneDrive\Documents\AssemblyStuff\AssemblyFactorial\AssemblyFactorial.asm"
-    # asm_path = sys.argv[1]
-    LC3_Assembler.main(asm_path)
+from Simulator.Assembler import LC3_Assembler
+if __name__ == "__main__":
+    
+    file_path = r"C:\lc3_assembly_work\chatgptfactorial.asm"
+    print(LC3_Assembler.assemble(file_path))
+    
+    # DEBUG PARSING
+    # file_path = r"C:\lc3_assembly_work\chatgptfactorial.asm"
+    # with open(file_path,'r') as asm_file:
+    #     readLines = asm_file.read()
+    # print(LC3_Assembler.ready_code_for_parsing(readLines))

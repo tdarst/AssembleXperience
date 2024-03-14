@@ -23,7 +23,17 @@ REGISTERS = {
     'R4':0x4,
     'R5':0x5,
     'R6':0x6,
-    'R7':0x7
+    'R7':0x7,
+    
+    
+    'r0':0x0,
+    'r1':0x1,
+    'r2':0x2,
+    'r3':0x3,
+    'r4':0x4,
+    'r5':0x5,
+    'r6':0x6,
+    'r7':0x7
 }
 
 # Length: 8 bits
@@ -34,7 +44,8 @@ TRAPS = {
     'PUTS'  : 0x22,
     'IN'    : 0x23,
     'PUTSP' : 0x24,
-    'HALT'  : 0x25
+    'HALT'  : 0x25,
+    
 } #PUTS, GETC, etc. 
 
 # Length: 4 bits
@@ -328,3 +339,13 @@ def get_nzp_bin_string(opcode: str) -> str:
                  else '111'
     
     return nzp_string
+
+# ===============================================================================
+# Name: lookup_all_caps
+# Purpose: Safe dictionary lookup guaranteeing uppercase match.
+# ===============================================================================
+def lookup_all_caps(key_to_lookup, dictionary):
+    try:
+        return dictionary[key_to_lookup.upper()]
+    except:
+        return None

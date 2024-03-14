@@ -18,8 +18,10 @@ def ready_code_for_parsing(code: str) -> str:
     code_list_comments_removed = [line.split(";")[0].strip() 
                                   for line in code_list 
                                   if line.split(';')[0]]
-
-    return code_list_comments_removed
+    
+    final_strip_pass = [x for x in code_list_comments_removed if x]
+    
+    return final_strip_pass
 
 # ==============================================================================
 # Name: check_if_solo_label
@@ -38,7 +40,16 @@ def line_is_solo_label(tokens: list) -> str:
 #          otherwise it returns None for opcode and 0 for index.
 # ==============================================================================
 def find_opcode_in_tokens(tokens: list) -> tuple[str, int]:
-    return next(((token, tokens.index(token)) for token in tokens if token in utils.opcode_dictionary), (None, 0))
+    # print(tokens)
+    # asdf = next(((token, tokens.index(token)) for token in tokens if utils.lookup_all_caps(token, utils.opcode_dictionary)), (None, 0))
+    # return asdf
+    found_opcode = tokens[0]
+    found_opcode_index = 0
+    for token in tokens:
+        if token.upper() in utils.opcode_dictionary:
+            found_opcode = token
+            found_opcode_index = tokens.index(token)
+    return found_opcode, found_opcode_index
 
 # ==============================================================================
 # Name: generate_tokens
@@ -99,10 +110,10 @@ def pass1(code_to_parse: str) -> tuple[dict, dict]:
     address_counter = 0x0
 
     # Count lines for error output.
-    line_counter = 1
+    line_counter = 0
 
     symbol_table = {
-        # address : {opcode : opcode (ops, pseudoOps, dots, etc.),
+        # address : {opcode : [ops, pseudoOps, dots, etc.],
         #            operands : [registers, labels, strings, etc.] 
         #            labels: [label1, label2, etc.]}
     }
@@ -114,49 +125,49 @@ def pass1(code_to_parse: str) -> tuple[dict, dict]:
     solo_label = None
 
     for line in ready_code_for_parsing(code_to_parse):
-
-        # Get parts of line as a list of tokens
-        tokens = generate_tokens(line)
-
-        # Check if line is a solo label
-        if line_is_solo_label(tokens):
-            solo_label = tokens[0]
-            line_counter += 1
-            continue
-
-        # If there is a solo label in the last line, add it to the current
-        elif solo_label:
-            tokens.insert(0, solo_label)
-            solo_label = None
-
-        # Find the opcode, save it's name and it's index so it can be used as a dividing line for parsing
-        opcode, opcode_index = find_opcode_in_tokens(tokens)
-
-        # Operands are all tokens occurring after the opcode,
-        # Labels are all tokens occurring before the opcode
-        operands = get_operands(tokens, opcode_index)
-        labels   = get_labels(tokens, opcode_index)
-
-        # If .ORIG is in the line then set address_counter to it and don't increment address_counter.
-        address_counter = check_for_ORIG(address_counter, opcode, operands)
-
-        # Create a dictionary 
-        # Key: line's hex address 
-        # Values: token categories.
-        address = hex(address_counter)
-        symbol_table[line_counter] = {
-            'address' : address,
-            KEY_OPCODE : opcode,
-            KEY_OPERANDS : operands,
-            KEY_LABELS : labels
-        }
-
-        # Update label_lookup with any labels
-        label_lookup = update_label_lookup(address, labels, label_lookup)
-        
-        # Increment the address_counter
-        address_counter += 0x1
         line_counter += 1
+        if line and not line.startswith(';'):
+            # Get parts of line as a list of tokens
+            tokens = generate_tokens(line)
+
+            # Check if line is a solo label
+            if line_is_solo_label(tokens):
+                solo_label = tokens[0]
+                line_counter += 1
+                continue
+
+            # If there is a solo label in the last line, add it to the current
+            elif solo_label:
+                tokens.insert(0, solo_label)
+                solo_label = None
+
+            # Find the opcode, save it's name and it's index so it can be used as a dividing line for parsing
+            opcode, opcode_index = find_opcode_in_tokens(tokens)
+
+            # Operands are all tokens occurring after the opcode,
+            # Labels are all tokens occurring before the opcode
+            operands = get_operands(tokens, opcode_index)
+            labels   = get_labels(tokens, opcode_index)
+
+            # If .ORIG is in the line then set address_counter to it and don't increment address_counter.
+            address_counter = check_for_ORIG(address_counter, opcode, operands)
+
+            # Create a dictionary 
+            # Key: line's hex address 
+            # Values: token categories.
+            address = hex(address_counter)
+            symbol_table[line_counter] = {
+                'address' : address,
+                KEY_OPCODE : opcode,
+                KEY_OPERANDS : operands,
+                KEY_LABELS : labels
+            }
+
+            # Update label_lookup with any labels
+            label_lookup = update_label_lookup(address, labels, label_lookup)
+            
+            # Increment the address_counter
+            address_counter += 0x1
 
     return symbol_table, label_lookup
 
@@ -168,23 +179,23 @@ def pass1(code_to_parse: str) -> tuple[dict, dict]:
 #          In doing this, labels that are used in operands are resolved so that
 #          the simulator knows where to look for the label's value.
 # ==============================================================================
-def pass2(symbol_table, label_lookup):
+def pass2(symbol_table: dict, label_lookup: dict) -> tuple[str, bool]:
     machine_code = ''
     error_string = ''
     for line_number, tokens in symbol_table.items():
         error_string = validlib.validate_line(line_number, tokens, label_lookup)
-        if not error_string:
-            opcode = tokens[KEY_OPCODE]
-            bin_string = parselib.PARSE_DICT[opcode](tokens['address'], tokens, label_lookup)
-        else:
+        
+        if error_string:
             print(error_string)
-            return error_string
+            return error_string, True
         
         opcode = tokens[KEY_OPCODE]
-        bin_string = parselib.PARSE_DICT[opcode](tokens['address'], tokens, label_lookup)
+        parse_func = utils.lookup_all_caps(opcode, parselib.PARSE_DICT)
+        bin_string = parse_func(tokens['address'], tokens, label_lookup)
+        
         machine_code += f"{bin_string}\n"
 
-    return machine_code.rstrip('\n')
+    return machine_code.rstrip('\n'), False
 
 # ===============================================================================
 # Name: main
@@ -193,30 +204,16 @@ def pass2(symbol_table, label_lookup):
 #          LC3_Bin_Files in LOCALAPPDATA. If no file is given then it just prints
 #          a message letting the user know.
 # ===============================================================================
-def main(asm_path):
+def assemble(asm_path: str) -> tuple[str, bool]:
     if asm_path:
         with open(asm_path,'r') as asm_file:
             readLines = asm_file.read()
 
         symbol_table, label_lookup = pass1(readLines)
-        machine_code = pass2(symbol_table, label_lookup)
-        print(machine_code)
-
-        local_path = os.getcwd()
-        bin_output_path = os.path.join(local_path, "LC3_Bin_Files")
-        if not os.path.exists(bin_output_path):
-            os.makedirs(bin_output_path)
-
-        file_name = os.path.split(asm_path)[1]
-        local_file_path = os.path.join(bin_output_path, f"{file_name.split('.')[0]}.bin")
-
-        if os.path.exists(local_file_path):
-            os.remove(local_file_path)
-
-        with open(local_file_path, 'w') as local_file:
-            local_file.write(machine_code)
-
-        print(f"OUTPUT COMPLETED - file can be found at {local_file_path}")
-
-    else:
-        print("LC3_Assembler, no file path given")
+        assembler_return_string, error = pass2(symbol_table, label_lookup)
+        
+        return assembler_return_string, error
+    
+if __name__ == "__main__":
+    file_path = r"C:\lc3_assembly_work\chatgptfactorial.asm"
+    assemble(file_path)
