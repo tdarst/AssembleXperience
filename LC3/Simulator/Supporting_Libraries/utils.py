@@ -349,3 +349,19 @@ def lookup_all_caps(key_to_lookup, dictionary):
         return dictionary[key_to_lookup.upper()]
     except:
         return None
+    
+def write_to_file(content_to_write, file_path):
+    try:
+        with open(file_path, 'w') as new_file:
+            new_file.write(content_to_write)
+        return True
+    except:
+        return False
+    
+def read_from_file(file_path):
+    try:
+        with open(file_path, 'r') as new_file:
+            content = new_file.read()
+        return content
+    except:
+        return None

@@ -186,7 +186,6 @@ def pass2(symbol_table: dict, label_lookup: dict) -> tuple[str, bool]:
         error_string = validlib.validate_line(line_number, tokens, label_lookup)
         
         if error_string:
-            print(error_string)
             return error_string, True
         
         opcode = tokens[KEY_OPCODE]
@@ -206,14 +205,17 @@ def pass2(symbol_table: dict, label_lookup: dict) -> tuple[str, bool]:
 # ===============================================================================
 def assemble(asm_path: str) -> tuple[str, bool]:
     if asm_path:
-        with open(asm_path,'r') as asm_file:
-            readLines = asm_file.read()
-
-        symbol_table, label_lookup = pass1(readLines)
-        assembler_return_string, error = pass2(symbol_table, label_lookup)
+        file_content = utils.read_from_file(asm_path)
+        if file_content:
+            symbol_table, label_lookup = pass1(file_content)
+            assembler_return_string, error = pass2(symbol_table, label_lookup)
+        else:
+            assembler_return_string = "Error: Could not load file"
+            error = True
         
         return assembler_return_string, error
-    
-if __name__ == "__main__":
-    file_path = r"C:\lc3_assembly_work\chatgptfactorial.asm"
-    assemble(file_path)
+
+# For debugging
+# if __name__ == "__main__":
+#     file_path = r"C:\lc3_assembly_work\chatgptfactorial.asm"
+#     assemble(file_path)
