@@ -1,4 +1,4 @@
-# GETTING STARTED
+# Getting Started
 1. Download any version of Python 3 from [Python's official website](https://www.python.org/downloads/)
 2. Make sure pip is installed by running **py -m ensurepip** in command line
 3. Clone repository
