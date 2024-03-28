@@ -12,7 +12,7 @@
 3. Run command **python runSimulator.py**
 
 # Navigating the Simulator
-### Edit Tab
+## Edit Tab
 Text Editor Window
 > The Text Editor allows you to write code with very basic editing features like a line counter and color coding.
 Console Window
@@ -27,7 +27,7 @@ Assemble Button
 > If there are any errors with the assembling process, or if the process is successful, you will be notified in the
 > console output. The file output of a successfully assembled file will be in the .obj2 format.
 
-### Simulate Tab
+## Simulate Tab
 Simulator Window
 > The simulator window holds the contents of the simulation inside after you've loaded a .obj2 file.
 Console Window
