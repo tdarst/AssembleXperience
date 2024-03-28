@@ -1,0 +1,78 @@
+<mxfile host="app.diagrams.net" modified="2024-03-25T23:20:13.326Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0" etag="3jgfzA3cs5rdw7KLV2f9" version="24.0.7" type="device">
+  <diagram name="Page-1" id="eEpTcb3pFUKLxBQq-0aH">
+    <mxGraphModel dx="1066" dy="571" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="ecsk6L-r3jk9fxwXWd1x-1" target="ecsk6L-r3jk9fxwXWd1x-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-1" value="Customer&lt;div&gt;[Person]&lt;/div&gt;&lt;div&gt;A customer of your commerce website&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="330" y="90" width="120" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="ecsk6L-r3jk9fxwXWd1x-13" target="ecsk6L-r3jk9fxwXWd1x-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-13" value="Web Application&lt;div&gt;[Container: Python-Django]&lt;/div&gt;&lt;div&gt;Shows all of the static content&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="90" y="260" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-15" value="Visits website" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="190" y="170" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="ecsk6L-r3jk9fxwXWd1x-16" target="ecsk6L-r3jk9fxwXWd1x-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-16" value="Multi-Page Application&lt;div&gt;[Container: Python-Django]&lt;/div&gt;&lt;div&gt;Allows customer to view things to purchase&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="330" y="265" width="130" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-18" value="Shows to the customer&#39;s browser" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="250" y="320" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="ecsk6L-r3jk9fxwXWd1x-18" target="ecsk6L-r3jk9fxwXWd1x-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-20" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="ecsk6L-r3jk9fxwXWd1x-1" target="ecsk6L-r3jk9fxwXWd1x-16">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="240" y="210" as="sourcePoint" />
+            <mxPoint x="290" y="160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-21" value="Views Product" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="395" y="180" width="60" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="ecsk6L-r3jk9fxwXWd1x-22" target="ecsk6L-r3jk9fxwXWd1x-23">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="397.5" y="520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="ecsk6L-r3jk9fxwXWd1x-22" target="ecsk6L-r3jk9fxwXWd1x-27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-22" value="API&lt;div&gt;[Container: Django rest framework]&lt;/div&gt;&lt;div&gt;Provides payment processing&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="335" y="420" width="125" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-23" value="Database&lt;div&gt;[Container: Postgresql]&lt;/div&gt;&lt;div&gt;Stores user information&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="330" y="570" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-26" value="Reads and writes" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="310" y="520" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="ecsk6L-r3jk9fxwXWd1x-27" target="ecsk6L-r3jk9fxwXWd1x-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-27" value="Email system&lt;div&gt;[Software System]&lt;/div&gt;&lt;div&gt;Emails receipts to customer&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-29" value="API Calls" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="410" y="370" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-30" value="Sends emails to customers using" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="540" y="480" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ecsk6L-r3jk9fxwXWd1x-32" value="Sends email to" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="590" y="235" width="60" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
