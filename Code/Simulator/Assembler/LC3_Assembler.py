@@ -1,4 +1,4 @@
-import os
+import os, tempfile
 from ..Supporting_Libraries import asemlib, validlib, utils
 
 KEY_OPCODE = utils.KEY_OPCODE
@@ -92,9 +92,11 @@ def get_labels(tokens: list, opcode_index: int) -> list:
 #          to the address specified by the operand following .ORIG
 # ==============================================================================
 def check_for_ORIG(address_counter: int, opcode: str, operands: list) -> tuple[int, bool]:
+    is_orig = False
     if opcode == utils.ORIG_OPCODE_NAME:
         address_counter = utils.hex_to_int(operands[0])
-    return address_counter
+        is_orig = True
+    return address_counter, is_orig
 
 # ==============================================================================
 # Name: pass1
@@ -150,7 +152,9 @@ def pass1(code_to_parse: str) -> tuple[dict, dict]:
             labels   = get_labels(tokens, opcode_index)
 
             # If .ORIG is in the line then set address_counter to it and don't increment address_counter.
-            address_counter = check_for_ORIG(address_counter, opcode, operands)
+            address_counter, is_orig = check_for_ORIG(address_counter, opcode, operands)
+            if is_orig:
+                continue
 
             # Create a dictionary 
             # Key: line's hex address 
@@ -194,40 +198,34 @@ def pass2(symbol_table: dict, label_lookup: dict) -> tuple[str, bool]:
         
         machine_code += f"{bin_string}\n"
 
-    return machine_code.rstrip('\n'), False
+    return machine_code, False
 
-def binary_to_hex(binary_data: str) -> bytes:
-    hex_data = ""
-    for line in binary_data.split(b'\r\n'):
-        if line.strip():  # Skip empty lines
-            # Convert each line of binary data to hexadecimal
-            hex_data += format(int(line, 2), '04x')
-    return bytes.fromhex(hex_data)
-
-
-def convert_to_object_file(binary_file: str, output_file: str) -> None:
+def convert_to_object_file(binary_file, asm_file, output_file):
+    asm_list = []
+    hex_data = []
+    with open(asm_file, 'rb') as asm:
+        asm_list = asm.readlines()
     try:
         # Open the binary file for reading
         with open(binary_file, 'rb') as f:
             # Read the binary data
-            binary_data = f.read()
-            print("Binary Data:", binary_data)  # Debug print
+            binary_data = f.readlines()
             
             # Convert binary data to hexadecimal
-            hex_data = binary_to_hex(binary_data)
+            for bin_string in binary_data:
+                hex_data.append(bin_string)
             
             # Create the object file
             with open(output_file, 'wb') as obj_file:
                 # Write LC3 object file header
-                # Assuming a simple LC3 object file format
-                obj_file.write(b'\x00\x00\x00\x00')  # Placeholder for header, 4 bytes
                 
-                # Write the hexadecimal instructions
-                obj_file.write(hex_data)
-                
+                for byte_str, asm_string in zip(hex_data, asm_list):
+                    obj_file.write(byte_str + asm_string)
                 print("Object file created successfully.")
+        return True
     except FileNotFoundError:
         print("Error: Binary file not found.")
+        return False
         
 
 # ===============================================================================
@@ -238,18 +236,34 @@ def convert_to_object_file(binary_file: str, output_file: str) -> None:
 #          a message letting the user know.
 # ===============================================================================
 def assemble(asm_path: str) -> tuple[str, bool]:
+    # Assemble to binary
     if asm_path:
         file_content = utils.read_from_file(asm_path)
         if file_content:
             symbol_table, label_lookup = pass1(file_content)
-            assembler_return_string, error = pass2(symbol_table, label_lookup)
+            pass_2_return_string, error = pass2(symbol_table, label_lookup)
         else:
-            assembler_return_string = "Error: Could not load file"
+            pass_2_return_string = "Error: Could not load file"
             error = True
         
-        return assembler_return_string, error
+        # Create bin file
+        bin_path = utils.get_bin_path(asm_path)
+        bin_written = utils.write_to_file(pass_2_return_string, bin_path)
+        if not bin_written:
+            pass_2_return_string = f"Error: Could not write bin file: {bin_path}, assembly failed"
+            error = True
+        
+        # Create obj2 file
+        obj2_path = utils.get_obj2_path(asm_path)
+        obj2_written = convert_to_object_file(bin_path, asm_path, obj2_path)
+        if not obj2_written:
+            pass_2_return_string = f"Error: Could not write obj2 file: {obj2_path}, assembly failed"
+            error = True
+            
+    return pass_2_return_string if error else f"{asm_path} successfully assembled as {bin_path} and {obj2_path}"
 
+        
 # For debugging
 # if __name__ == "__main__":
-#     file_path = r"C:\lc3_assembly_work\chatgptfactorial.asm"
+#     file_path = r"C:\lc3_assembly_work\similaritytest.asm"
 #     assemble(file_path)

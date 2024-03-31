@@ -15,11 +15,9 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QTextBrowser{
-	background:black
 }
 
 QTextEdit {
-	background: black
 }</string>
   </property>
   <widget class="QTabWidget" name="Application_TabWidget">
@@ -32,7 +30,7 @@ QTextEdit {
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="Simulate_Tab">
     <attribute name="title">
@@ -55,16 +53,6 @@ QTextEdit {
        <y>60</y>
        <width>1131</width>
        <height>761</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QTextBrowser" name="Simulate_ConsoleTextBrowser">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>330</y>
-       <width>451</width>
-       <height>491</height>
       </rect>
      </property>
     </widget>
@@ -169,6 +157,16 @@ QTextEdit {
      </property>
      <property name="text">
       <string>Simulator</string>
+     </property>
+    </widget>
+    <widget class="QTextEdit" name="Simulate_ConsoleTextEditor">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>330</y>
+       <width>451</width>
+       <height>491</height>
+      </rect>
      </property>
     </widget>
    </widget>

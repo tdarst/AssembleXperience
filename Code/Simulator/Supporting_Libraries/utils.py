@@ -1,9 +1,11 @@
-import re
+import re, random
 
 # Keep in mind the upper limit of range in python is not included
 IMM5_INT_RANGE = range(-16, 16)
 OFFSET6_INT_RANGE = range(-32, 32)
 IMM16_INT_RANGE = range(-32768, 32768)
+FOUR_DIG_HEX_MIN = -32768
+FOUR_DIG_HEX_MAX = -32767
 BLKW_INT_RANGE = range(1, 501)
 STRINGZ_INT_RANGE = range(0, 501)
 
@@ -124,6 +126,13 @@ def convert_to_python_hex_format(hex_str: str) -> str:
 # ==============================================================================
 def int_to_bin(num: int) -> str:
     return bin(num)[2:] if num >= 0 else bin(num)[3:]
+
+# ==============================================================================
+# Name: int_to_bin
+# Purpose: returns the POSITIVE hex string for a given int
+# ==============================================================================
+def int_to_hex(num: int) -> str:
+    return "0x" + hex(num)[2:].zfill(4)
 
 # ==============================================================================
 # Name: hash_to_int
@@ -368,9 +377,10 @@ def lookup_all_caps(key_to_lookup, dictionary):
 # Name: write_to_file
 # Purpose: open a file and write given content.
 # ===============================================================================
-def write_to_file(content_to_write, file_path):
+def write_to_file(content_to_write, file_path, byte_like=False):
+    write_type = 'w' if not byte_like else 'wb'
     try:
-        with open(file_path, 'w') as new_file:
+        with open(file_path, write_type) as new_file:
             new_file.write(content_to_write)
         return True
     except:
@@ -380,10 +390,24 @@ def write_to_file(content_to_write, file_path):
 # Name: read_from_file
 # Purpose: open a file and read it's contents.
 # ===============================================================================  
-def read_from_file(file_path):
+def read_from_file(file_path, byte_like=False):
+    read_type = 'r' if not byte_like else 'rb'
     try:
-        with open(file_path, 'r') as new_file:
+        with open(file_path, read_type) as new_file:
             content = new_file.read()
         return content
     except:
         return None
+    
+def get_bin_path(asm_path):
+    bin_path = asm_path.removesuffix(".asm")
+    bin_path += ".bin"
+    return bin_path
+
+def get_obj2_path(asm_path):
+    obj2_path = asm_path.removesuffix(".asm")
+    obj2_path += ".obj2"
+    return obj2_path
+
+def get_random_number(min, max):
+    return random.randint(min, max)

@@ -4,6 +4,7 @@ from PyQt5.QtCore import QTimer, Qt
 from PyQt5 import uic
 from asyncqt import QEventLoop, asyncSlot
 from ..Assembler import LC3_Assembler
+from ..Sim import LC3_Simulator
 from ..Supporting_Libraries import utils
 
 LINE_TIMER_TIME = 50
@@ -43,6 +44,8 @@ class AssembleXperience(QWidget):
         self.Edit_LoadButton.clicked.connect(self.load_editor)
         self.Edit_AssembleButton.clicked.connect(self.assemble_editor)
         
+        self.Simulate_LoadButton.clicked.connect(self.load_simulator)
+        
     def init_timers(self) -> None:
         self.editor_line_timer = QTimer()
         self.editor_line_timer.timeout.connect(self.populate_line_numbers)
@@ -68,6 +71,9 @@ class AssembleXperience(QWidget):
         
         self.currentState = 'simulate'
         self.editor_loaded_file = ''
+        
+        self.simulator_loaded_file = ''
+        self.machine_state = None
         
     def change_state(self) -> None:
         current_index = str(self.Application_TabWidget.currentIndex())
@@ -151,6 +157,49 @@ class AssembleXperience(QWidget):
                 self.write_to_editor_console(f"{bin_file_path} assembled successfully!")
             else:
                 self.write_to_editor_console(f"Error: assembly unsuccessful, could not write to {bin_file_path}.")
+                
+    def populate_simulator_file_name_display(self) -> None:
+        self.Edit_FileNameTextBrowser.clear()
+        self.Edit_FileNameTextBrowser.append(f"Simulating: {os.path.split(self.simulator_loaded_file)[-1]}")
+                
+    def load_simulator(self) -> None:
+        options = QFileDialog.Options()
+        file_path, _ = QFileDialog.getOpenFileName(self, "Open File", "", "OBJ2 Files (*.obj2)", options=options)
+        content = utils.read_from_file(file_path)
+        if content:
+            self.generate_simulation(file_path)
+            self.simulator_loaded_file = file_path
+            self.populate_simulator_file_name_display()
+            
+    def generate_simulation(self, obj2_file_path: str) -> None:
+        self.machine_state = LC3_Simulator.create_simulation(obj2_file_path)
+        self.refresh_simulation()
+        
+    def refresh_simulation(self) -> None:
+        self.write_memory_space_to_simulator_window()
+        self.write_registers_to_register_window()
+        self.write_output_to_console()
+        
+    def write_memory_space_to_simulator_window(self) -> None:
+        self.Simulate_SimulatorTextBrowser.clear()
+        memory_space_string = ""
+        for address, content in self.machine_state.memory_space.items():
+            if content:
+                memory_space_string += f"    {address}\t{content[0]}\t{content[1]}\n"
+            else:
+                memory_space_string += f"    {address}\n"
+        self.Simulate_SimulatorTextBrowser.append(memory_space_string)
+    
+    def write_registers_to_register_window(self) -> None:
+        self.Simulate_RegistersTextBrowser.clear()
+        register_string = ""
+        for register, value in self.machine_state.registers.items():
+            register_string += f"{register}\t{value}\n"
+        self.Simulate_RegistersTextBrowser.append(register_string)
+    
+    def write_output_to_console(self) -> None:
+        self.Simulate_ConsoleTextEditor.clear()
+        self.Simulate_ConsoleTextEditor.append(self.machine_state.console_output)
                 
 def main(): 
     app = QApplication(sys.argv)
