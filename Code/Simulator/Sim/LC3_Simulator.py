@@ -47,6 +47,7 @@ class MachineState:
         return memory_space
     
     def write_instructions_to_memory_space(self, addressed_instructions: dict) -> None:
+        self.registers['PC'] = utils.hex_to_int(list(addressed_instructions.keys())[0])
         for key in addressed_instructions.keys():
             self.memory_space[key] += addressed_instructions[key]
     
@@ -94,8 +95,6 @@ def construct_instructions(symbol_table: dict) -> dict:
 def add_numbers_to_instructions(addressed_instructions: dict, binary_instructions: list) -> dict:
     # Slices off .END instruction
     keys = list(addressed_instructions.keys())
-    # Slices off .ORIG binary
-    # binary_instructions = binary_instructions[1:]
     for index, key in enumerate(keys):
         addressed_instructions[key].insert(0, binary_instructions[index])
     return addressed_instructions

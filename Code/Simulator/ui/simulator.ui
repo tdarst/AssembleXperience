@@ -42,7 +42,7 @@ QTextEdit {
        <x>190</x>
        <y>30</y>
        <width>271</width>
-       <height>271</height>
+       <height>311</height>
       </rect>
      </property>
     </widget>
@@ -114,7 +114,7 @@ QTextEdit {
      <property name="geometry">
       <rect>
        <x>200</x>
-       <y>300</y>
+       <y>340</y>
        <width>91</width>
        <height>31</height>
       </rect>
@@ -163,9 +163,9 @@ QTextEdit {
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>330</y>
+       <y>370</y>
        <width>451</width>
-       <height>491</height>
+       <height>451</height>
       </rect>
      </property>
     </widget>

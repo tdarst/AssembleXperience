@@ -185,17 +185,21 @@ class AssembleXperience(QWidget):
         memory_space_string = ""
         for address, content in self.machine_state.memory_space.items():
             if content:
-                memory_space_string += f"    {address}\t{content[0]}\t{content[1]}\n"
+                memory_space_string += f"|    {address}\t{content[0]}\t{content[1]}\n"
             else:
-                memory_space_string += f"    {address}\n"
+                memory_space_string += f"|    {address}\n"
         self.Simulate_SimulatorTextBrowser.append(memory_space_string)
     
     def write_registers_to_register_window(self) -> None:
         self.Simulate_RegistersTextBrowser.clear()
         register_string = ""
         for register, value in self.machine_state.registers.items():
-            register_string += f"{register}\t{value}\n"
+            if register != "CC":
+                register_string += f"{register}\t{utils.int_to_hex(value)}\n\n"
+            else:
+                register_string += f"{register}\t{value}"
         self.Simulate_RegistersTextBrowser.append(register_string)
+        self.Simulate_RegistersTextBrowser.verticalScrollBar().setValue(0)
     
     def write_output_to_console(self) -> None:
         self.Simulate_ConsoleTextEditor.clear()
