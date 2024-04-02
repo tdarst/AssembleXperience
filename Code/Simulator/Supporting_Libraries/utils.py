@@ -179,6 +179,10 @@ def bin_to_hash(bin_str: str) -> str:
     int_val = bin_to_int(bin_str)
     return f"#{int_val}"
 
+def bin_to_hex(bin_str: str) -> str:
+    int_val = bin_to_int(bin_str)
+    return int_to_hex(int_val)
+
 # ==============================================================================
 # Name: is_register
 # Purpose: returns True if token is a valid register, False otherwise.
@@ -230,13 +234,15 @@ def is_label(tok: str, label_lookup: dict) -> bool:
 # Purpose: returns True if token is a valid offset6 value, False otherwise.
 # ==============================================================================
 def is_offset6(tok: str) -> bool:
-    try:
-        isOffset6 = tok.startswith('#') \
-        and int(tok.replace('#','')) in OFFSET6_INT_RANGE
-    except:
-        isOffset6 = False
+    offset6 = False
+    if is_hex(tok):
+        if hex_to_int(tok) in OFFSET6_INT_RANGE:
+            offset6 = True
+    elif is_hash(tok):
+        if hash_to_int(tok) in OFFSET6_INT_RANGE:
+            offset6 = True
     
-    return isOffset6
+    return offset6
 
 # ==============================================================================
 # Name: is_hex
@@ -303,13 +309,20 @@ def calc_twos_complement(bin_string: str):
         
     return twos_complement
 
-def twos_complement_to_integer(binary_str):
+def twos_complement_to_integer(binary_str: str) -> int:
     if binary_str[0] == '1':
         inverted_bits = ''.join('1' if bit == '0' else '0' for bit in binary_str)
         binary_str = bin(int(inverted_bits, 2) + 1)[2:]
         return -int(binary_str, 2)
     else:
         return int(binary_str, 2)
+    
+def not_int(integer: int) -> int:
+    not_str = ""
+    for digit in bin(integer)[2:]:
+        i = int(digit)
+        not_str += str(int(not i))
+    return int("0b" + not_str, 2)
 
 # ==============================================================================
 # Name: calc_offset9

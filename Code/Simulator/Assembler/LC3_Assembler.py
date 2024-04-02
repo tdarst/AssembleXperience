@@ -95,6 +95,17 @@ def check_for_ORIG(address_counter: int, opcode: str, operands: list) -> tuple[i
         is_orig = True
     return address_counter, is_orig
 
+def check_for_multi_block_pseudo(address_counter: int, opcode: str, operands: list) -> int:
+    if ".STRINGZ" in opcode.upper():
+        string_no_quotes = operands[0][1:-1]
+        address_counter += len(string_no_quotes)
+    if ".BLKW" in opcode.upper():
+        if utils.is_hash(operands[0]):
+            address_counter += utils.hash_to_int(operands[0]) - 1
+        elif utils.is_hex(operands[0]):
+            address_counter += utils.hex_to_int(operands[0]) - 1
+            
+    return address_counter
 # ==============================================================================
 # Name: pass1
 # Purpose: Pass one of the assembler parses the raw assembly code and formats
@@ -161,6 +172,8 @@ def pass1(code_to_parse: str) -> tuple[dict, dict]:
                 KEY_OPERANDS : operands,
                 KEY_LABELS : labels
             }
+            
+            address_counter = check_for_multi_block_pseudo(address_counter, opcode, operands)
 
             # Update label_lookup with any labels
             label_lookup = update_label_lookup(address, labels, label_lookup)
@@ -204,32 +217,65 @@ def format_asm_for_conversion(asm_list: list):
             
     return asm_list
 
-def convert_to_object_file(binary_file, asm_file, output_file):
-    asm_list = []
-    hex_data = []
-    with open(asm_file, 'rb') as asm:
-        asm_list = asm.readlines()
+def pair_instructions(bin_list, asm_list):
+    obj2_string = ""
+    bin_index = 0
+    for asm_ins in asm_list:
+        if bin_index < len(bin_list):
+            if not ".STRINGZ" in asm_ins and not ".BLKW" in asm_ins:
+                obj2_string += f"{bin_list[bin_index]}:{asm_ins}\n"
+                bin_index += 1
+            elif ".STRINGZ" in asm_ins:
+                inspect_ins = asm_ins.split(" ")
+                stringz_string = inspect_ins[-1][1:-1]
+                num_extra_blocks = len(stringz_string) + bin_index + 1
+                obj2_string += f"{bin_list[bin_index]}:{inspect_ins[0]}\n"
+                bin_index += 1
+                while bin_index < num_extra_blocks:
+                    obj2_string += f"{bin_list[bin_index]}:x\n"
+                    bin_index += 1
+            elif ".BLKW" in asm_ins:
+                inspect_ins = asm_ins.split(" ")
+                num = inspect_ins[-1]
+                if utils.is_hash(num):
+                    num_extra_blocks = utils.hash_to_int(num) + bin_index
+                else:
+                    num_extra_blocks = utils.hex_to_int(num) + bin_index
+                obj2_string += f"{bin_list[bin_index]}:{inspect_ins[0]}\n"
+                bin_index += 1
+                while bin_index < num_extra_blocks:
+                    obj2_string += f"{bin_list[bin_index]}:x\n"
+                    bin_index += 1
+    return obj2_string.removesuffix('\n')
+
+def create_obj2_file(binary_file, asm_file, output_file):
+    success = False
     try:
-        # Open the binary file for reading
-        with open(binary_file, 'rb') as f:
-            # Read the binary data
-            binary_data = f.readlines()
+        asm_list = []
+        bin_list = []
+        
+        def clean_list(str_list: list) -> list:
+            new_str_list = [string.replace('\n', '') for string in str_list]
+            new_str_list2 = [string for string in new_str_list if string]
+            return new_str_list2
+        
+        
+        with open(asm_file, 'r') as asm:
+            asm_list = clean_list(asm.readlines())
+        with open(binary_file, 'r') as bin:
+            bin_list = clean_list(bin.readlines())
             
-            # Convert binary data to hexadecimal
-            for bin_string in binary_data:
-                hex_data.append(bin_string)
+        obj2_contents = pair_instructions(bin_list, asm_list)
+        
+        with open(output_file, 'w') as obj2_file:
+            obj2_file.write(obj2_contents)
             
-            # Create the object file
-            with open(output_file, 'wb') as obj_file:
-                # Write LC3 object file header
-                
-                for byte_str, asm_string in zip(hex_data, asm_list):
-                    obj_file.write(byte_str + asm_string)
-                print("Object file created successfully.")
-        return True
-    except FileNotFoundError:
-        print("Error: Binary file not found.")
-        return False
+        success = True
+        
+    except Exception as e:
+        success = False
+        
+    return success
         
 
 # ===============================================================================
@@ -250,20 +296,22 @@ def assemble(asm_path: str) -> tuple[str, bool]:
             pass_2_return_string = "Error: Could not load file"
             error = True
         
-        # Create bin file
-        bin_path = utils.get_bin_path(asm_path)
-        bin_written = utils.write_to_file(pass_2_return_string, bin_path)
-        if not bin_written:
-            pass_2_return_string = f"Error: Could not write bin file: {bin_path}, assembly failed"
-            error = True
+        if not error:
+            # Create bin file
+            bin_path = utils.get_bin_path(asm_path)
+            bin_written = utils.write_to_file(pass_2_return_string, bin_path)
+            if not bin_written:
+                pass_2_return_string = f"Error: Could not write bin file: {bin_path}, assembly failed"
+                error = True
         
+        if not error:
         # Create obj2 file
-        obj2_path = utils.get_obj2_path(asm_path)
-        obj2_written = convert_to_object_file(bin_path, asm_path, obj2_path)
-        if not obj2_written:
-            pass_2_return_string = f"Error: Could not write obj2 file: {obj2_path}, assembly failed"
-            error = True
-            
+            obj2_path = utils.get_obj2_path(asm_path)
+            obj2_written = create_obj2_file(bin_path, asm_path, obj2_path)
+            if not obj2_written:
+                pass_2_return_string = f"Error: Could not write obj2 file: {obj2_path}, assembly failed"
+                error = True
+                
     return pass_2_return_string if error else f"{asm_path} successfully assembled as {bin_path} and {obj2_path}"
 
         

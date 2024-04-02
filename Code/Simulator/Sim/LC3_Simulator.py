@@ -8,6 +8,7 @@ class MachineState:
         self.write_instructions_to_memory_space(addressed_instructions)
         self.label_lookup = label_lookup
         self.console_output = ""
+        self.running = True
         
     def __init_state(self, create_with_random: bool) -> dict:
         if create_with_random:
@@ -51,48 +52,69 @@ class MachineState:
         for key in addressed_instructions.keys():
             self.memory_space[key] += addressed_instructions[key]
     
-def decode_obj2(obj2_file_path: str) -> tuple[list, list]:
-    bytes_string = ""
-    with open(obj2_file_path, 'r') as bytes:
-        bytes_string=bytes.read()
-    decoded_lines = bytes_string.split('\n')
-    bin_vals = []
-    asm_vals = []
+# def decode_obj2(obj2_file_path: str) -> tuple[list, list]:
+#     bytes_string = ""
+#     with open(obj2_file_path, 'r') as bytes:
+#         bytes_string=bytes.read()
+#     decoded_lines = bytes_string.split('\n')
+#     bin_vals = []
+#     asm_vals = []
 
-    for i in decoded_lines:
-        if utils.is_bin(i):
-            bin_vals.append(i)
-        else:
-            asm_vals.append(i)
+#     for i in decoded_lines:
+#         if utils.is_bin(i):
+#             bin_vals.append(i)
+#         else:
+#             asm_vals.append(i)
     
-    return bin_vals, asm_vals
+#     return bin_vals, asm_vals
 
-def construct_instructions(symbol_table: dict) -> dict:
-    instruction_set = {}
-    def get_operand_string(operands: list) -> str:
-        operand_string = ""
-        if operands:
-            for i in range(len(operands)-1):
-                operand_string += operands[i] + ", "
-            operand_string += operands[-1]
-        return operand_string
+# def construct_instructions(symbol_table: dict) -> dict:
+#     instruction_set = {}
+#     def get_operand_string(operands: list) -> str:
+#         operand_string = ""
+#         if operands:
+#             for i in range(len(operands)-1):
+#                 operand_string += operands[i] + ", "
+#             operand_string += operands[-1]
+#         return operand_string
     
-    def get_label_string(labels: list) -> str:
-        label_string = ""
-        if labels:
-            for label in labels:
-                label_string += f"{label} "
-        return label_string
+#     def get_label_string(labels: list) -> str:
+#         label_string = ""
+#         if labels:
+#             for label in labels:
+#                 label_string += f"{label} "
+#         return label_string
 
-    instruction_set = {}
+#     instruction_set = {}
     
-    for value in symbol_table.values():
-        a = value['opcode']
-        b = not '.ORIG' == value['opcode']
-        if '.END' not in value['opcode'] and ".ORIG" not in value['opcode']:
-            instruction_set.update({value['address']:[f"{get_label_string(value['labels'])}{value['opcode']} {get_operand_string(value['operands'])}"]})
+#     for value in symbol_table.values():
+#         if '.END' not in value['opcode'] and ".ORIG" not in value['opcode']:
+#             instruction_set.update({value['address']:[f"{get_label_string(value['labels'])}{value['opcode']} {get_operand_string(value['operands'])}"]})
         
-    return instruction_set
+#     return instruction_set
+
+def decode_obj2(obj2_file_path: str) -> tuple[list, list]:
+    bin_ins = []
+    asm_ins = []
+    obj2_contents = utils.read_from_file(obj2_file_path)
+    ins_list = obj2_contents.split('\n')
+    for instruction in ins_list:
+        bin, asm = instruction.split(":")
+        bin_ins.append(bin)
+        asm_ins.append(asm)
+    return bin_ins, asm_ins
+
+def address_instructions(bin_ins: list, asm_ins: list) -> dict:
+    addressed_instructions = {}
+    pc = utils.bin_to_int(bin_ins[0])
+    included_bin_instructions = bin_ins[1:]
+    included_asm_instructions = asm_ins[1:]
+    for bin, asm in zip(included_bin_instructions, included_asm_instructions):
+        address = utils.int_to_hex(pc)
+        addressed_instructions[address] = [bin, asm]
+        pc += 1
+    return addressed_instructions
+        
 
 def add_numbers_to_instructions(addressed_instructions: dict, binary_instructions: list) -> dict:
     # Slices off .END instruction
@@ -105,12 +127,9 @@ def add_numbers_to_instructions(addressed_instructions: dict, binary_instruction
         
 def create_simulation(obj2_file_path: str, create_with_random=False) -> MachineState:
     binary_ins, asm_ins = decode_obj2(obj2_file_path)
-    asm_ins_string = "\n".join(asm_ins)
-    symbol_table, label_lookup = LC3_Assembler.pass1(asm_ins_string)
-    addressed_instructions = construct_instructions(symbol_table)
-    updated_addressed_instructions = add_numbers_to_instructions(addressed_instructions, binary_ins)
+    addressed_instructions = address_instructions(binary_ins, asm_ins)
     
-    machine_state = MachineState(updated_addressed_instructions, label_lookup, create_with_random)
+    machine_state = MachineState(addressed_instructions, create_with_random)
     
     return machine_state
     

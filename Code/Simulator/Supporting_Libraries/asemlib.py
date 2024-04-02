@@ -265,10 +265,10 @@ def asem_blkw(address: str, tokens: dict, label_lookup: dict) -> str:
 def asem_stringz(address: str, tokens: dict, label_lookup: dict) -> str:
     operand = tokens[KEY_OPERANDS][0]
     bin_string = ''
-    for char in operand:
+    for char in operand[1:-1]:
         bin_char = utils.int_to_bin(ord(char)).zfill(MAX_LINE_LENGTH)
         bin_string += bin_char + '\n'
-    bin_string += ''.zfill(MAX_LINE_LENGTH)
+    bin_string += "0000000000000000"
     
     return bin_string
 
@@ -282,7 +282,7 @@ def asem_add(address: str, tokens: dict, label_lookup: dict) -> str:
 
 # ===============================================================================
 # Name: asem_and
-# Purpose: Takes tokens for AND lines and turns them into their binary
+# Purpose: Takes tokens for AND lines and turns them into their binaryF
 #          equivalent. Uses asem_add_or_and.
 # ===============================================================================
 def asem_and(address: str, tokens: dict, label_lookup: dict) -> str:

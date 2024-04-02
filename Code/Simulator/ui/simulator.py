@@ -51,7 +51,11 @@ class AssembleXperience(QWidget):
         self.Edit_AssembleButton.clicked.connect(self.assemble_editor)
         
         self.Simulate_LoadButton.clicked.connect(self.load_simulator)
+        self.Simulate_ReloadButton.clicked.connect(self.reload_simulator)
         self.Simulate_StepButton.clicked.connect(self.step_over)
+        self.Simulate_RunButton.clicked.connect(self.run)
+        self.Simulate_ReinitializeButton.clicked.connect(self.reinitialize_machine)
+        self.Simulate_RandomizeButton.clicked.connect(self.randomize_machine)
         
     def init_timers(self) -> None:
         self.editor_line_timer = QTimer()
@@ -173,29 +177,50 @@ class AssembleXperience(QWidget):
             self.populate_simulator_file_name_display()
             
     def generate_simulation(self, obj2_file_path: str) -> None:
+        self.Simulate_RunButton.setEnabled(True)
+        self.Simulate_StepButton.setEnabled(True)        
         self.machine_state = LC3_Simulator.create_simulation(obj2_file_path)
         self.refresh_simulation()
         
-    def refresh_simulation(self) -> None:
-        self.write_memory_space_to_simulator_window()
-        self.write_registers_to_register_window()
-        self.write_output_to_console()
+    def halt_simulation(self) -> None:
+        self.Simulate_RunButton.setEnabled(False)
+        self.Simulate_StepButton.setEnabled(False)
         
+    def reload_simulator(self) -> None:
+        self.generate_simulation(self.simulator_loaded_file)
+        
+    def reinitialize_machine(self):
+        pass
+    
+    def randomize_machine(self):
+        pass
+        
+    def refresh_simulation(self) -> None:
+        if self.machine_state.running:
+            self.write_memory_space_to_simulator_window()
+            self.write_registers_to_register_window()
+            self.write_output_to_console()
+        else:
+            self.halt_simulation()
+    
     def write_memory_space_to_simulator_window(self) -> None:
         self.Simulate_SimulatorTextBrowser.clear()
         memory_space_string = ""
         program_counter_string = utils.int_to_hex(self.machine_state.registers['PC'])
         counter = 0
         for address, content in self.machine_state.memory_space.items():
-            
             if content and address == program_counter_string:
-                memory_space_string += f'| -> {address}\t\t{content[0]}\t{content[1]}\n'
+                binary = content[0]
+                instruction = content[1] if content[1] != 'x' else ""
+                memory_space_string += f'| -> {address}\t\t{binary}\t{instruction}\n'
                 arrow_line_num = counter
             elif address == program_counter_string:
                 memory_space_string += f'| -> {address}\n'
                 arrow_line_num = counter
             elif content:
-                memory_space_string += f"|    {address}\t\t{content[0]}\t{content[1]}\n"
+                binary = content[0]
+                instruction = content[1] if len(content) == 2 and content[1] != 'x' else ""
+                memory_space_string += f"|    {address}\t\t{binary}\t{instruction}\n"
             else:
                 memory_space_string += f"|    {address}\n"
             counter += 1
@@ -228,6 +253,9 @@ class AssembleXperience(QWidget):
     def step_over(self) -> None:
         self.machine_state = LC3_Simulator.step_over(self.machine_state)
         self.refresh_simulation()
+        
+    def run(self) -> None:
+        pass
                 
 def main(): 
     app = QApplication(sys.argv)
