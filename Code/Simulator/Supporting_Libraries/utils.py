@@ -303,6 +303,14 @@ def calc_twos_complement(bin_string: str):
         
     return twos_complement
 
+def twos_complement_to_integer(binary_str):
+    if binary_str[0] == '1':
+        inverted_bits = ''.join('1' if bit == '0' else '0' for bit in binary_str)
+        binary_str = bin(int(inverted_bits, 2) + 1)[2:]
+        return -int(binary_str, 2)
+    else:
+        return int(binary_str, 2)
+
 # ==============================================================================
 # Name: calc_offset9
 # Purpose: Calculates 9 bit offset value from given current and label addresses.

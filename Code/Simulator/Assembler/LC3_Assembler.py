@@ -40,9 +40,6 @@ def line_is_solo_label(tokens: list) -> str:
 #          otherwise it returns None for opcode and 0 for index.
 # ==============================================================================
 def find_opcode_in_tokens(tokens: list) -> tuple[str, int]:
-    # print(tokens)
-    # asdf = next(((token, tokens.index(token)) for token in tokens if utils.lookup_all_caps(token, utils.opcode_dictionary)), (None, 0))
-    # return asdf
     found_opcode = tokens[0]
     found_opcode_index = 0
     for token in tokens:
@@ -153,8 +150,6 @@ def pass1(code_to_parse: str) -> tuple[dict, dict]:
 
             # If .ORIG is in the line then set address_counter to it and don't increment address_counter.
             address_counter, is_orig = check_for_ORIG(address_counter, opcode, operands)
-            if is_orig:
-                continue
 
             # Create a dictionary 
             # Key: line's hex address 
@@ -171,7 +166,8 @@ def pass1(code_to_parse: str) -> tuple[dict, dict]:
             label_lookup = update_label_lookup(address, labels, label_lookup)
             
             # Increment the address_counter
-            address_counter += 0x1
+            if not is_orig:
+                address_counter += 0x1
 
     return symbol_table, label_lookup
 
@@ -199,6 +195,14 @@ def pass2(symbol_table: dict, label_lookup: dict) -> tuple[str, bool]:
         machine_code += f"{bin_string}\n"
 
     return machine_code, False
+
+def format_asm_for_conversion(asm_list: list):
+    
+    for i in range(len(asm_list)-1):
+        if b".ORIG" in asm_list[i]:
+            asm_list.remove(asm_list[i])
+            
+    return asm_list
 
 def convert_to_object_file(binary_file, asm_file, output_file):
     asm_list = []

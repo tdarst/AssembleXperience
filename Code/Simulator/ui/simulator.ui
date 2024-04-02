@@ -15,9 +15,11 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QTextBrowser{
+ font-family: Consolas,monaco,monospace;
 }
 
 QTextEdit {
+ font-family: Consolas,monaco,monospace;
 }</string>
   </property>
   <widget class="QTabWidget" name="Application_TabWidget">

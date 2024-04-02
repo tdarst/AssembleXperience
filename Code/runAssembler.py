@@ -1,8 +1,8 @@
 from Simulator.Assembler import LC3_Assembler
 import sys
 if __name__ == "__main__":
-    file_path = sys.argv[1]
-    # file_path = r"C:\lc3_assembly_work\chatgptfactorial.asm"
+    # file_path = sys.argv[1]
+    file_path = r"C:\lc3_assembly_work\similaritytest.asm"
     print(LC3_Assembler.assemble(file_path))
     
     # DEBUG PARSING

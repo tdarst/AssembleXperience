@@ -1,6 +1,7 @@
 import sys, os
 from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QTextEdit
-from PyQt5.QtCore import QTimer, Qt
+from PyQt5.QtCore import QTimer, Qt, pyqtSignal
+from PyQt5.QtGui import QTextCursor
 from PyQt5 import uic
 from asyncqt import QEventLoop, asyncSlot
 from ..Assembler import LC3_Assembler
@@ -10,6 +11,9 @@ from ..Supporting_Libraries import utils
 LINE_TIMER_TIME = 50
 
 class AssembleXperience(QWidget):
+    
+    scroll_signal = pyqtSignal(int)
+    
     def __init__(self):
         super().__init__()
         
@@ -18,6 +22,7 @@ class AssembleXperience(QWidget):
         uic.loadUi(path + "\\simulator.ui", self)
         
         self.init_timers()
+        self.init_signals()
         self.init_widget_settings()
         self.init_variables()
         self.init_actions()
@@ -31,10 +36,11 @@ class AssembleXperience(QWidget):
         # Sets text editor to side-scroll instead of wrapping text.
         self.Edit_EditorTextEditor.setLineWrapMode(QTextEdit.NoWrap)
         self.Edit_LineNumberTextBrowser.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-
+        
+    def init_signals(self) -> None:
+        self.scroll_signal.connect(self.scroll_to_program_counter)
         
     def init_actions(self) -> None:
-        self.populate_registers()
         self.populate_line_numbers()
         
         self.Application_TabWidget.currentChanged.connect(self.change_state)
@@ -45,6 +51,7 @@ class AssembleXperience(QWidget):
         self.Edit_AssembleButton.clicked.connect(self.assemble_editor)
         
         self.Simulate_LoadButton.clicked.connect(self.load_simulator)
+        self.Simulate_StepButton.clicked.connect(self.step_over)
         
     def init_timers(self) -> None:
         self.editor_line_timer = QTimer()
@@ -75,6 +82,8 @@ class AssembleXperience(QWidget):
         self.simulator_loaded_file = ''
         self.machine_state = None
         
+        self.font_height = self.Simulate_SimulatorTextBrowser.fontMetrics().height()
+        
     def change_state(self) -> None:
         current_index = str(self.Application_TabWidget.currentIndex())
         self.states[current_index]()
@@ -84,11 +93,6 @@ class AssembleXperience(QWidget):
     
     def state_edit(self) -> None:
         self.editor_line_timer.start(LINE_TIMER_TIME)
-        
-    def populate_registers(self) -> None:
-        self.Simulate_RegistersTextBrowser.clear()
-        for reg_name, reg_val in self.registers_dict.items():
-            self.Simulate_RegistersTextBrowser.append(f"{reg_name}:  {reg_val}\n")
             
     def populate_line_numbers(self) -> None:
         self.Edit_LineNumberTextBrowser.clear()
@@ -142,10 +146,7 @@ class AssembleXperience(QWidget):
         
     def assemble_editor(self) -> None:
         if self.editor_loaded_file:
-            assembler_return_string, error = LC3_Assembler.assemble(self.editor_loaded_file)
-            
-        if error:
-            self.write_to_editor_console(assembler_return_string)
+            assembler_return_string = LC3_Assembler.assemble(self.editor_loaded_file)
             
         else:
             split_path = os.path.split(self.editor_loaded_file)
@@ -159,8 +160,8 @@ class AssembleXperience(QWidget):
                 self.write_to_editor_console(f"Error: assembly unsuccessful, could not write to {bin_file_path}.")
                 
     def populate_simulator_file_name_display(self) -> None:
-        self.Edit_FileNameTextBrowser.clear()
-        self.Edit_FileNameTextBrowser.append(f"Simulating: {os.path.split(self.simulator_loaded_file)[-1]}")
+        self.Simulate_FileNameTextBrowser.clear()
+        self.Simulate_FileNameTextBrowser.append(f"Simulating: {os.path.split(self.simulator_loaded_file)[-1]}")
                 
     def load_simulator(self) -> None:
         options = QFileDialog.Options()
@@ -183,12 +184,31 @@ class AssembleXperience(QWidget):
     def write_memory_space_to_simulator_window(self) -> None:
         self.Simulate_SimulatorTextBrowser.clear()
         memory_space_string = ""
+        program_counter_string = utils.int_to_hex(self.machine_state.registers['PC'])
+        counter = 0
         for address, content in self.machine_state.memory_space.items():
-            if content:
-                memory_space_string += f"|    {address}\t{content[0]}\t{content[1]}\n"
+            
+            if content and address == program_counter_string:
+                memory_space_string += f'| -> {address}\t\t{content[0]}\t{content[1]}\n'
+                arrow_line_num = counter
+            elif address == program_counter_string:
+                memory_space_string += f'| -> {address}\n'
+                arrow_line_num = counter
+            elif content:
+                memory_space_string += f"|    {address}\t\t{content[0]}\t{content[1]}\n"
             else:
                 memory_space_string += f"|    {address}\n"
+            counter += 1
+
         self.Simulate_SimulatorTextBrowser.append(memory_space_string)
+        QTimer.singleShot(750, lambda: self.scroll_signal.emit(arrow_line_num))
+        
+    def scroll_to_program_counter(self, line_num) -> None:
+        # cursor = QTextCursor(self.Simulate_SimulatorTextBrowser.document().findBlockByLineNumber(line_num + 45))
+        # self.Simulate_SimulatorTextBrowser.setTextCursor(cursor)
+        # self.Simulate_SimulatorTextBrowser.ensureCursorVisible()
+        position = self.font_height * (line_num)
+        self.Simulate_SimulatorTextBrowser.verticalScrollBar().setValue(position)
     
     def write_registers_to_register_window(self) -> None:
         self.Simulate_RegistersTextBrowser.clear()
@@ -204,6 +224,10 @@ class AssembleXperience(QWidget):
     def write_output_to_console(self) -> None:
         self.Simulate_ConsoleTextEditor.clear()
         self.Simulate_ConsoleTextEditor.append(self.machine_state.console_output)
+        
+    def step_over(self) -> None:
+        self.machine_state = LC3_Simulator.step_over(self.machine_state)
+        self.refresh_simulation()
                 
 def main(): 
     app = QApplication(sys.argv)

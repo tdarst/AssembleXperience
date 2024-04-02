@@ -87,13 +87,16 @@ def construct_instructions(symbol_table: dict) -> dict:
     instruction_set = {}
     
     for value in symbol_table.values():
-        if '.END' not in value['opcode']:
+        a = value['opcode']
+        b = not '.ORIG' == value['opcode']
+        if '.END' not in value['opcode'] and ".ORIG" not in value['opcode']:
             instruction_set.update({value['address']:[f"{get_label_string(value['labels'])}{value['opcode']} {get_operand_string(value['operands'])}"]})
         
     return instruction_set
 
 def add_numbers_to_instructions(addressed_instructions: dict, binary_instructions: list) -> dict:
     # Slices off .END instruction
+    binary_instructions = binary_instructions[1:]
     keys = list(addressed_instructions.keys())
     for index, key in enumerate(keys):
         addressed_instructions[key].insert(0, binary_instructions[index])
@@ -108,6 +111,21 @@ def create_simulation(obj2_file_path: str, create_with_random=False) -> MachineS
     updated_addressed_instructions = add_numbers_to_instructions(addressed_instructions, binary_ins)
     
     machine_state = MachineState(updated_addressed_instructions, label_lookup, create_with_random)
+    
+    return machine_state
+    
+def step_over(machine_state: MachineState) -> MachineState:
+    program_counter_key = machine_state.registers['PC']
+    memory_content = machine_state.memory_space[utils.int_to_hex(program_counter_key)]
+    bin_instruction = memory_content[0] if memory_content else None
+    
+    if bin_instruction:
+        if bin_instruction not in simulib.SIMU_FIXED_OPCODE_DICT:
+            opcode = bin_instruction[:4]
+            machine_state = simulib.SIMU_DYNAMIC_OPCODE_DICT[opcode](machine_state, bin_instruction)
+        else:
+            opcode = bin_instruction
+            machine_state = simulib.SIMU_FIXED_OPCODE_DICT[opcode](machine_state, bin_instruction)
     
     return machine_state
     
