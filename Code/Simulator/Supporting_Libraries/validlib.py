@@ -506,6 +506,7 @@ VALID_DICT = {
     'GETC': valid_explicit_trap,
     'OUT' : valid_explicit_trap,
     'PUTS': valid_explicit_trap,
+    'PUTSP': valid_explicit_trap,
     'IN'  : valid_explicit_trap,
     'HALT': valid_explicit_trap,
 

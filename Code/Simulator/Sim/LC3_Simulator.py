@@ -51,47 +51,6 @@ class MachineState:
         self.registers['PC'] = utils.hex_to_int(list(addressed_instructions.keys())[0])
         for key in addressed_instructions.keys():
             self.memory_space[key] += addressed_instructions[key]
-    
-# def decode_obj2(obj2_file_path: str) -> tuple[list, list]:
-#     bytes_string = ""
-#     with open(obj2_file_path, 'r') as bytes:
-#         bytes_string=bytes.read()
-#     decoded_lines = bytes_string.split('\n')
-#     bin_vals = []
-#     asm_vals = []
-
-#     for i in decoded_lines:
-#         if utils.is_bin(i):
-#             bin_vals.append(i)
-#         else:
-#             asm_vals.append(i)
-    
-#     return bin_vals, asm_vals
-
-# def construct_instructions(symbol_table: dict) -> dict:
-#     instruction_set = {}
-#     def get_operand_string(operands: list) -> str:
-#         operand_string = ""
-#         if operands:
-#             for i in range(len(operands)-1):
-#                 operand_string += operands[i] + ", "
-#             operand_string += operands[-1]
-#         return operand_string
-    
-#     def get_label_string(labels: list) -> str:
-#         label_string = ""
-#         if labels:
-#             for label in labels:
-#                 label_string += f"{label} "
-#         return label_string
-
-#     instruction_set = {}
-    
-#     for value in symbol_table.values():
-#         if '.END' not in value['opcode'] and ".ORIG" not in value['opcode']:
-#             instruction_set.update({value['address']:[f"{get_label_string(value['labels'])}{value['opcode']} {get_operand_string(value['operands'])}"]})
-        
-#     return instruction_set
 
 def decode_obj2(obj2_file_path: str) -> tuple[list, list]:
     bin_ins = []

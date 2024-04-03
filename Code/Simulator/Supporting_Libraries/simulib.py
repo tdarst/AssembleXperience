@@ -94,7 +94,7 @@ def simu_jsr_or_jsrr(machine_state: object, bin_instruction: str) -> object:
     
     return machine_state
 
-def simu_ld_or_ldi_or_lea(machine_state: object, bin_instruction: str) -> object:
+def simu_ld(machine_state: object, bin_instruction: str) -> object:
     dr = bin_instruction[4:7]
     offset = bin_instruction[7:]
     pc_offset_address = utils.int_to_hex(machine_state.registers['PC'] + utils.twos_complement_to_integer(offset) + 1)
@@ -114,6 +114,15 @@ def simu_ldr(machine_state: object, bin_instruction: str) -> object:
     offset = bin_instruction[10:]
     
     machine_state.registers[SIMU_REGISTERS_DICT[dr]] = machine_state.registers[SIMU_REGISTERS_DICT[br]] + utils.twos_complement_to_integer(offset)
+    
+    machine_state.registers['PC'] += 1
+    return machine_state
+
+def simu_lea(machine_state: object, bin_instruction: str) -> object:
+    dr = bin_instruction[4:7]
+    offset = bin_instruction[7:]
+    
+    machine_state.registers[SIMU_REGISTERS_DICT[dr]] = machine_state.registers['PC'] + utils.bin_to_int(offset) + 1
     
     machine_state.registers['PC'] += 1
     return machine_state
@@ -185,14 +194,45 @@ def simu_halt_trapx25(machine_state: object, bin_instruction: str) -> object:
     machine_state.running = False
     return machine_state
 
+def simu_puts_trapx22(machine_state: object, bin_instruction: str) -> object:
+    null = False
+    address = machine_state.registers['R0']
+    while null == False:
+        string_address = utils.int_to_hex(address)
+        bin_ins = machine_state.memory_space[string_address][0]
+        machine_state.console_output += chr(utils.bin_to_int(bin_ins))
+        if all(char == '0' for char in bin_ins):
+            null = True
+        address += 1
+    
+    machine_state.registers['PC'] += 1
+    return machine_state
+
+def simu_putsp_trapx24(machine_state: object, bin_instruction: str) -> object:
+    null = False
+    address = machine_state.registers['R0']
+    while null == False:
+        string_address = utils.int_to_hex(address)
+        bin_ins = machine_state.memory_space[string_address][0]
+        char1 = bin_ins[8:16]
+        char2 = bin_ins[0:8]
+        machine_state.console_output += chr(utils.bin_to_int(char1))
+        machine_state.console_output += chr(utils.bin_to_int(char2))
+        if all(char == '0' for char in bin_ins):
+            null = True
+        address += 1
+    
+    machine_state.registers['PC'] += 1
+    return machine_state
+
 SIMU_FIXED_OPCODE_DICT = {
     utils.RET_BIN_STRING : simu_ret,
     utils.RTI_BIN_STRING : 'RTI',
     utils.int_to_bin(utils.TRAPS['GETC']).zfill(16) : 'GETC',
     "1111000000100001": simu_out_trapx21,
-    utils.int_to_bin(utils.TRAPS['PUTS']).zfill(16) : 'PUTS',
+    "1111000000100010" : simu_puts_trapx22,
     utils.int_to_bin(utils.TRAPS['IN']).zfill(16) : 'IN',
-    utils.int_to_bin(utils.TRAPS['PUTSP']).zfill(16) : 'PUTSP',
+    "1111000000100100" : simu_putsp_trapx24,
     "1111000000100101" : simu_halt_trapx25,
 }
 
@@ -200,18 +240,17 @@ SIMU_DYNAMIC_OPCODE_DICT = {
     utils.int_to_bin(utils.OPCODE['BR']).zfill(4) : simu_br,
     utils.int_to_bin(utils.OPCODE['ADD']).zfill(4) : simu_add,
     utils.int_to_bin(utils.OPCODE['AND']).zfill(4) : simu_and,   
-    utils.int_to_bin(utils.OPCODE['LD']).zfill(4) : simu_ld_or_ldi_or_lea,
+    utils.int_to_bin(utils.OPCODE['LD']).zfill(4) : simu_ld,
     utils.int_to_bin(utils.OPCODE['ST']).zfill(4) : simu_st,
     utils.int_to_bin(utils.OPCODE['JSR']).zfill(4) : simu_jsr_or_jsrr,
     utils.int_to_bin(utils.OPCODE['LDR']).zfill(4) : simu_ldr,
     utils.int_to_bin(utils.OPCODE['STR']).zfill(4) : simu_str,
     utils.int_to_bin(utils.OPCODE['NOT']).zfill(4) : simu_not,
-    utils.int_to_bin(utils.OPCODE['LDI']).zfill(4) : simu_ld_or_ldi_or_lea,
+    utils.int_to_bin(utils.OPCODE['LDI']).zfill(4) : simu_ldi,
     utils.int_to_bin(utils.OPCODE['STI']).zfill(4) : simu_sti,
     utils.int_to_bin(utils.OPCODE['JMP']).zfill(4) : simu_jmp,
     utils.int_to_bin(utils.OPCODE['RES']).zfill(4) : 'RES',
-    utils.int_to_bin(utils.OPCODE['LEA']).zfill(4) : 'LEA',
-    utils.int_to_bin(utils.OPCODE['TRAP']).zfill(4) : 'TRAP'
+    utils.int_to_bin(utils.OPCODE['LEA']).zfill(4) : simu_lea
 }
 
 SIMU_REGISTERS_DICT = {

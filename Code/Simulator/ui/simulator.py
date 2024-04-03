@@ -249,6 +249,7 @@ class AssembleXperience(QWidget):
     def write_output_to_console(self) -> None:
         self.Simulate_ConsoleTextEditor.clear()
         self.Simulate_ConsoleTextEditor.append(self.machine_state.console_output)
+        self.machine_state.console_output = ""
         
     def step_over(self) -> None:
         self.machine_state = LC3_Simulator.step_over(self.machine_state)

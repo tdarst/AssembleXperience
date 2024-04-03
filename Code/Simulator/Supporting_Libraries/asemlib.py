@@ -424,6 +424,7 @@ asem_DICT = {
     'GETC': asem_explicit_trap,
     'OUT' : asem_explicit_trap,
     'PUTS': asem_explicit_trap,
+    'PUTSP': asem_explicit_trap,
     'IN'  : asem_explicit_trap,
     'HALT': asem_explicit_trap,
 
