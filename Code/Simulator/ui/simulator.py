@@ -177,6 +177,7 @@ class AssembleXperience(QWidget):
             self.populate_simulator_file_name_display()
             
     def generate_simulation(self, obj2_file_path: str) -> None:
+        self.Simulate_ConsoleTextEditor.clear()
         self.Simulate_RunButton.setEnabled(True)
         self.Simulate_StepButton.setEnabled(True)        
         self.machine_state = LC3_Simulator.create_simulation(obj2_file_path)
@@ -226,7 +227,7 @@ class AssembleXperience(QWidget):
             counter += 1
 
         self.Simulate_SimulatorTextBrowser.append(memory_space_string)
-        QTimer.singleShot(750, lambda: self.scroll_signal.emit(arrow_line_num))
+        QTimer.singleShot(1000, lambda: self.scroll_signal.emit(arrow_line_num))
         
     def scroll_to_program_counter(self, line_num) -> None:
         # cursor = QTextCursor(self.Simulate_SimulatorTextBrowser.document().findBlockByLineNumber(line_num + 45))
@@ -247,7 +248,6 @@ class AssembleXperience(QWidget):
         self.Simulate_RegistersTextBrowser.verticalScrollBar().setValue(0)
     
     def write_output_to_console(self) -> None:
-        self.Simulate_ConsoleTextEditor.clear()
         self.Simulate_ConsoleTextEditor.append(self.machine_state.console_output)
         self.machine_state.console_output = ""
         
