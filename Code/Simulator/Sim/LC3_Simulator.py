@@ -1,17 +1,17 @@
 from ..Supporting_Libraries import simulib, utils
-from ..Assembler import LC3_Assembler
 
 class MachineState:
-    def __init__(self, addressed_instructions, label_lookup, create_with_random=False) -> None:
-        self.registers = self.__init_state(create_with_random)
-        self.memory_space = self.init_memory_space()
+    def __init__(self, addressed_instructions, label_lookup, random=False) -> None:
+        self.registers = self.init_state(random)
+        self.memory_space = self.init_memory_space(random)
         self.write_instructions_to_memory_space(addressed_instructions)
         self.label_lookup = label_lookup
+        self.input_mode = 0 # input mode 0 indicates no input, 1 indicates echo (GETC), 2 indicates no echo (IN)
         self.console_output = ""
         self.running = True
         
-    def __init_state(self, create_with_random: bool) -> dict:
-        if create_with_random:
+    def init_state(self, random: bool) -> dict:
+        if random:
             registers = {
                 "R0" : utils.get_random_number(utils.FOUR_DIG_HEX_MIN, utils.FOUR_DIG_HEX_MAX),
                 "R1" : utils.get_random_number(utils.FOUR_DIG_HEX_MIN, utils.FOUR_DIG_HEX_MAX),
@@ -43,14 +43,18 @@ class MachineState:
             }
         return registers
     
-    def init_memory_space(self) -> dict:
-        memory_space = {utils.int_to_hex(key): [] for key in range(0x0000, 0x8000 + 1)}
+    def init_memory_space(self, random) -> dict:
+        if random:
+            get_random_bin = lambda: utils.int_to_bin(utils.get_random_number(utils.FOUR_DIG_HEX_MIN, utils.FOUR_DIG_HEX_MAX))
+            memory_space = {utils.int_to_hex(key): [get_random_bin()] for key in range(0x0000, 0x8000 + 1)}
+        else:
+            memory_space = {utils.int_to_hex(key): ['0'*16] for key in range(0x0000, 0x8000 + 1)}
         return memory_space
     
     def write_instructions_to_memory_space(self, addressed_instructions: dict) -> None:
         self.registers['PC'] = utils.hex_to_int(list(addressed_instructions.keys())[0])
         for key in addressed_instructions.keys():
-            self.memory_space[key] += addressed_instructions[key]
+            self.memory_space[key] = addressed_instructions[key]
 
 def decode_obj2(obj2_file_path: str) -> tuple[list, list]:
     bin_ins = []
@@ -98,14 +102,37 @@ def step_over(machine_state: MachineState) -> MachineState:
     bin_instruction = memory_content[0] if memory_content else None
     
     if bin_instruction:
-        if bin_instruction not in simulib.SIMU_FIXED_OPCODE_DICT:
+        if bin_instruction[:4] in simulib.SIMU_DYNAMIC_OPCODE_DICT:
             opcode = bin_instruction[:4]
             machine_state = simulib.SIMU_DYNAMIC_OPCODE_DICT[opcode](machine_state, bin_instruction)
-        else:
+            machine_state.registers['IR'] = machine_state.registers['PC'] - 1
+        elif bin_instruction in simulib.SIMU_FIXED_OPCODE_DICT:
             opcode = bin_instruction
             machine_state = simulib.SIMU_FIXED_OPCODE_DICT[opcode](machine_state, bin_instruction)
-    
+            machine_state.registers['IR'] = machine_state.registers['PC'] - 1
+        else:
+            machine_state.registers['PC'] += 1
     return machine_state
+
+def run(machine_state: MachineState) -> MachineState:
     
+    while machine_state.running and not machine_state.input_mode:
+        pc_int = machine_state.registers['PC']
+        memory_content = machine_state.memory_space[utils.int_to_hex(pc_int)]
+        bin_instruction = memory_content[0] if memory_content else None
+    
+        if bin_instruction:
+            if bin_instruction[:4] in simulib.SIMU_DYNAMIC_OPCODE_DICT:
+                opcode = bin_instruction[:4]
+                machine_state = simulib.SIMU_DYNAMIC_OPCODE_DICT[opcode](machine_state, bin_instruction)
+                machine_state.registers['IR'] = machine_state.registers['PC'] - 1
+            elif bin_instruction in simulib.SIMU_FIXED_OPCODE_DICT:
+                opcode = bin_instruction
+                machine_state = simulib.SIMU_FIXED_OPCODE_DICT[opcode](machine_state, bin_instruction)
+                machine_state.registers['IR'] = machine_state.registers['PC'] - 1
+            else:
+                machine_state.registers['PC'] += 1
+               
+    return machine_state 
     
     

@@ -8,8 +8,6 @@ from ..Assembler import LC3_Assembler
 from ..Sim import LC3_Simulator
 from ..Supporting_Libraries import utils
 
-LINE_TIMER_TIME = 50
-
 class AssembleXperience(QWidget):
     
     scroll_signal = pyqtSignal(int)
@@ -20,6 +18,7 @@ class AssembleXperience(QWidget):
         path = os.path.dirname(os.path.abspath(__file__))
         # Load the UI file
         uic.loadUi(path + "\\simulator.ui", self)
+        self.setWindowTitle("AssembleXperience")
         
         self.init_timers()
         self.init_signals()
@@ -36,6 +35,10 @@ class AssembleXperience(QWidget):
         # Sets text editor to side-scroll instead of wrapping text.
         self.Edit_EditorTextEditor.setLineWrapMode(QTextEdit.NoWrap)
         self.Edit_LineNumberTextBrowser.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        
+        self.Simulate_ConsoleLineEdit.setMaxLength(1)
+        
+        self.Simulate_SimulatorTextBrowser.installEventFilter(self)
         
     def init_signals(self) -> None:
         self.scroll_signal.connect(self.scroll_to_program_counter)
@@ -61,6 +64,9 @@ class AssembleXperience(QWidget):
         self.editor_line_timer = QTimer()
         self.editor_line_timer.timeout.connect(self.populate_line_numbers)
         
+        self.check_for_input_timer = QTimer()
+        self.check_for_input_timer.timeout.connect(self.check_for_input)
+        
     def init_variables(self) -> None:
         self.registers_dict = {
             'R0' : '0',
@@ -77,8 +83,12 @@ class AssembleXperience(QWidget):
         
         self.states = {
             '0': self.state_simulate,
-            '1': self.state_edit
+            '1': self.state_edit,
+            '2': self.state_get_input,
         }
+        
+        self.line_timer_time = 50
+        self.check_for_input_time = 10
         
         self.currentState = 'simulate'
         self.editor_loaded_file = ''
@@ -88,15 +98,46 @@ class AssembleXperience(QWidget):
         
         self.font_height = self.Simulate_SimulatorTextBrowser.fontMetrics().height()
         
+        self.disable_buttons_during_input = [
+            self.Simulate_RunButton,
+            self.Simulate_StepButton,
+            self.Simulate_ReinitializeButton,
+            self.Simulate_RandomizeButton
+        ]
+        
+        self.mem_counter = 0
+        
+    def eventFilter(self, obj: object, event) -> object:
+        if obj == self.Simulate_SimulatorTextBrowser and event.type() == event.Wheel:
+            delta = event.angleDelta().y()
+            if delta > 0:
+                self.mem_counter -= 1
+            else:
+                self.mem_counter += 1
+                
+            self.write_memory_space_to_simulator_window()
+        return super().eventFilter(obj, event)
+        
     def change_state(self) -> None:
         current_index = str(self.Application_TabWidget.currentIndex())
         self.states[current_index]()
         
     def state_simulate(self) -> None:
+        self.Simulate_ConsoleLineEdit.clear()
+        self.Simulate_ConsoleLineEdit.setReadOnly(True)
+        for button in self.disable_buttons_during_input:
+            button.setEnabled(True)
         self.editor_line_timer.stop()
+        self.check_for_input_timer.stop()
     
     def state_edit(self) -> None:
-        self.editor_line_timer.start(LINE_TIMER_TIME)
+        self.editor_line_timer.start(self.line_timer_time)
+        
+    def state_get_input(self) -> None:
+        self.Simulate_ConsoleLineEdit.setReadOnly(False)
+        self.check_for_input_timer.start(self.check_for_input_time)
+        for button in self.disable_buttons_during_input:
+            button.setEnabled(False)
             
     def populate_line_numbers(self) -> None:
         self.Edit_LineNumberTextBrowser.clear()
@@ -132,12 +173,14 @@ class AssembleXperience(QWidget):
             utils.write_to_file(content, self.editor_loaded_file)
         else:
             self.save_as_editor()
+            self.populate_editor_file_name_display()
 
     def save_as_editor(self) -> None:
         options = QFileDialog.Options()
         file_path, _ = QFileDialog.getSaveFileName(self, "Save File", "", "Asm Files (*.asm);;Bin Files (*.bin);;All Files(*) ", options=options)
         content = self.get_editor_text()
         utils.write_to_file(content, file_path)
+        self.editor_loaded_file = file_path
         
     def load_editor(self) -> None:
         options = QFileDialog.Options()
@@ -177,10 +220,11 @@ class AssembleXperience(QWidget):
             self.populate_simulator_file_name_display()
             
     def generate_simulation(self, obj2_file_path: str) -> None:
-        self.Simulate_ConsoleTextEditor.clear()
+        self.Simulate_ConsoleTextBrowser.clear()
         self.Simulate_RunButton.setEnabled(True)
         self.Simulate_StepButton.setEnabled(True)        
         self.machine_state = LC3_Simulator.create_simulation(obj2_file_path)
+        self.mem_counter = self.machine_state.registers["PC"]
         self.refresh_simulation()
         
     def halt_simulation(self) -> None:
@@ -191,43 +235,74 @@ class AssembleXperience(QWidget):
         self.generate_simulation(self.simulator_loaded_file)
         
     def reinitialize_machine(self):
-        pass
+        self.machine_state.memory_space = self.machine_state.init_memory_space(random=False)
+        self.machine_state.registers = self.machine_state.init_state(random=False)
+        self.refresh_simulation()
     
     def randomize_machine(self):
-        pass
+        self.machine_state.memory_space = self.machine_state.init_memory_space(random=True)
+        self.machine_state.registers = self.machine_state.init_state(random=True)
+        self.refresh_simulation()
         
     def refresh_simulation(self) -> None:
         if self.machine_state.running:
-            self.write_memory_space_to_simulator_window()
-            self.write_registers_to_register_window()
-            self.write_output_to_console()
+            input_mode = self.machine_state.input_mode
+            if input_mode:
+                self.state_get_input() 
+            
+            else:    
+                self.write_memory_space_to_simulator_window()
+                self.write_registers_to_register_window()
+                self.write_output_to_console()
         else:
             self.halt_simulation()
-    
+            
+    def check_for_input(self):
+        input_mode = self.machine_state.input_mode
+        input = self.Simulate_ConsoleLineEdit.text()
+        if len(input) > 0:
+            if input_mode == 1:
+                self.machine_state.console_output = input
+            self.machine_state.registers['R0'] = ord(input)
+            self.machine_state.input_mode = 0
+            self.machine_state.registers['PC'] += 1
+            self.state_simulate()
+            
+            
+        self.refresh_simulation()
+            
     def write_memory_space_to_simulator_window(self) -> None:
+        # self.Simulate_SimulatorTextBrowser.clear()
+        # memory_space_string = ""
+        # program_counter_string = utils.int_to_hex(self.machine_state.registers['PC'])
+        # counter = 0
+        # for address, content in self.machine_state.memory_space.items():
+        #     if content and address == program_counter_string:
+        #         binary = content[0]
+        #         instruction = content[1] if len(content) == 2 and content[1] != 'x' else ""
+        #         memory_space_string += f'| -> {address}\t\t{binary}\t{instruction}\n'
+        #         arrow_line_num = counter
+        #     elif content:
+        #         binary = content[0]
+        #         instruction = content[1] if len(content) == 2 and content[1] != 'x' else ""
+        #         memory_space_string += f"|    {address}\t\t{binary}\t{instruction}\n"
+        #     counter += 1
+
+        # self.Simulate_SimulatorTextBrowser.append(memory_space_string)
+        # QTimer.singleShot(1000, lambda: self.scroll_signal.emit(arrow_line_num))
+        
         self.Simulate_SimulatorTextBrowser.clear()
         memory_space_string = ""
-        program_counter_string = utils.int_to_hex(self.machine_state.registers['PC'])
-        counter = 0
-        for address, content in self.machine_state.memory_space.items():
-            if content and address == program_counter_string:
-                binary = content[0]
-                instruction = content[1] if content[1] != 'x' else ""
-                memory_space_string += f'| -> {address}\t\t{binary}\t{instruction}\n'
-                arrow_line_num = counter
-            elif address == program_counter_string:
-                memory_space_string += f'| -> {address}\n'
-                arrow_line_num = counter
-            elif content:
-                binary = content[0]
-                instruction = content[1] if len(content) == 2 and content[1] != 'x' else ""
-                memory_space_string += f"|    {address}\t\t{binary}\t{instruction}\n"
+        program_counter = self.machine_state.registers['PC']
+        mem_count = self.mem_counter
+        for i in range(mem_count, mem_count + 33):
+            addr_str = utils.int_to_hex(i)
+            contents = self.machine_state.memory_space[addr_str]
+            if len(contents) == 2:
+                memory_space_string += f"|    {addr_str}\t{contents[0]}\t{contents[1]}\n" if i != program_counter else f"| -> {addr_str}\t{contents[0]}\t{contents[1]}\n"
             else:
-                memory_space_string += f"|    {address}\n"
-            counter += 1
-
-        self.Simulate_SimulatorTextBrowser.append(memory_space_string)
-        QTimer.singleShot(1000, lambda: self.scroll_signal.emit(arrow_line_num))
+                memory_space_string += f"|    {addr_str}\t{contents[0]}\n" if i != program_counter else f"| -> {addr_str}\t{contents[0]}\n"
+        self.Simulate_SimulatorTextBrowser.append(memory_space_string.removesuffix('\n'))
         
     def scroll_to_program_counter(self, line_num) -> None:
         # cursor = QTextCursor(self.Simulate_SimulatorTextBrowser.document().findBlockByLineNumber(line_num + 45))
@@ -241,14 +316,14 @@ class AssembleXperience(QWidget):
         register_string = ""
         for register, value in self.machine_state.registers.items():
             if register != "CC":
-                register_string += f"{register}\t{utils.int_to_hex(value)}\n\n"
+                register_string += f"{register}\t{utils.int_to_hex(value)}\t{value}\n\n"
             else:
                 register_string += f"{register}\t{value}"
         self.Simulate_RegistersTextBrowser.append(register_string)
         self.Simulate_RegistersTextBrowser.verticalScrollBar().setValue(0)
     
     def write_output_to_console(self) -> None:
-        self.Simulate_ConsoleTextEditor.append(self.machine_state.console_output)
+        self.Simulate_ConsoleTextBrowser.append(self.machine_state.console_output)
         self.machine_state.console_output = ""
         
     def step_over(self) -> None:

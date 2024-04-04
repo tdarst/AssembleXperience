@@ -28,7 +28,7 @@ def asem_add_or_and(address: str, tokens: dict, label_lookup: dict) -> str:
 
     elif utils.is_imm5(OP3):
         bin_OP3 = '1'
-        bin_OP3 += utils.hash_to_bin(OP3).zfill(5)
+        bin_OP3 += utils.integer_to_twos_complement(utils.hash_to_int(OP3), 5)
 
     bin_string = bin_opcode + bin_OP1 + bin_OP2 + bin_OP3
 
@@ -235,8 +235,12 @@ def asem_fill(address: str, tokens: dict, label_lookup: dict) -> str:
     if utils.is_hex(num_val):
         bin_val = utils.hex_to_bin(num_val)
     
-    elif utils.is_imm5(num_val):
-        bin_val = utils.hash_to_bin(num_val)
+    elif utils.is_hash(num_val):
+        num_val = utils.hash_to_int(num_val)
+        if num_val < 0:
+            bin_val = utils.one_fill(utils.calc_twos_complement(utils.int_to_bin(num_val)), 16)
+        else:
+            bin_val = utils.int_to_bin(num_val)
 
     bin_string = bin_val.zfill(MAX_LINE_LENGTH)
 

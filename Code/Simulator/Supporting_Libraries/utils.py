@@ -120,6 +120,10 @@ def convert_to_python_hex_format(hex_str: str) -> str:
     converted_str = hex_str[:index_found] + '0' + hex_str[index_found:]
     return converted_str
 
+def one_fill(bin_string, req_len):
+    fill_num = req_len - len(bin_string)
+    return '1'*fill_num + bin_string
+
 # ==============================================================================
 # Name: int_to_bin
 # Purpose: returns the POSITIVE binary string for a given int
@@ -132,7 +136,14 @@ def int_to_bin(num: int) -> str:
 # Purpose: returns the POSITIVE hex string for a given int
 # ==============================================================================
 def int_to_hex(num: int) -> str:
-    return "0x" + hex(num)[2:].zfill(4)
+    if num < 0:
+        num = (1 << 16) + num
+    
+    # Convert the number to hexadecimal
+    hex_str = hex(num)[2:].zfill(4)
+    
+    # Add '0x' prefix and return
+    return "0x" + hex_str
 
 # ==============================================================================
 # Name: hash_to_int
@@ -273,7 +284,7 @@ def is_imm16(tok: str) -> bool:
     elif is_hash(tok):
         val = hash_to_int(tok)
 
-    if val and val in IMM16_INT_RANGE:
+    if val != None and val in IMM16_INT_RANGE:
         tok_is_imm16 = True
 
     return tok_is_imm16
@@ -309,6 +320,14 @@ def calc_twos_complement(bin_string: str):
         
     return twos_complement
 
+def integer_to_twos_complement(integer: int, num_bits: int) -> str:
+    if integer >= 0:
+        # If the number is positive, simply convert to binary
+        return bin(integer)[2:].zfill(num_bits)
+    else:
+        # If the number is negative, calculate the two's complement
+        return bin((1 << num_bits) + integer)[2:]
+
 def twos_complement_to_integer(binary_str: str) -> int:
     if binary_str[0] == '1':
         inverted_bits = ''.join('1' if bit == '0' else '0' for bit in binary_str)
@@ -318,11 +337,7 @@ def twos_complement_to_integer(binary_str: str) -> int:
         return int(binary_str, 2)
     
 def not_int(integer: int) -> int:
-    not_str = ""
-    for digit in bin(integer)[2:]:
-        i = int(digit)
-        not_str += str(int(not i))
-    return int("0b" + not_str, 2)
+    return ~integer
 
 # ==============================================================================
 # Name: calc_offset9
@@ -430,5 +445,5 @@ def get_obj2_path(asm_path):
     obj2_path += ".obj2"
     return obj2_path
 
-def get_random_number(min, max):
+def get_random_number(min: int, max: int) -> int:
     return random.randint(min, max)

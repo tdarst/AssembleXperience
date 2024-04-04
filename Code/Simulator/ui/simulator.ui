@@ -20,6 +20,10 @@
 
 QTextEdit {
  font-family: Consolas,monaco,monospace;
+}
+
+#Simulate_SimulatorTextBrowser{
+ font-size: 19px;
 }</string>
   </property>
   <widget class="QTabWidget" name="Application_TabWidget">
@@ -53,8 +57,8 @@ QTextEdit {
       <rect>
        <x>470</x>
        <y>60</y>
-       <width>1131</width>
-       <height>761</height>
+       <width>1141</width>
+       <height>741</height>
       </rect>
      </property>
     </widget>
@@ -116,7 +120,7 @@ QTextEdit {
      <property name="geometry">
       <rect>
        <x>200</x>
-       <y>340</y>
+       <y>360</y>
        <width>91</width>
        <height>31</height>
       </rect>
@@ -161,14 +165,50 @@ QTextEdit {
       <string>Simulator</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="Simulate_ConsoleTextEditor">
+    <widget class="QTextEdit" name="Simulate_ConsoleTextBrowser">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>450</y>
+       <width>451</width>
+       <height>351</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="Simulate_ConsoleLineEdit">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>390</y>
+       <width>441</width>
+       <height>21</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>370</y>
-       <width>451</width>
-       <height>451</height>
+       <width>47</width>
+       <height>13</height>
       </rect>
+     </property>
+     <property name="text">
+      <string>IN:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>430</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>OUT:</string>
      </property>
     </widget>
    </widget>

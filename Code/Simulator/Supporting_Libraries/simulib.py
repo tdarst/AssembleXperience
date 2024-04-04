@@ -11,7 +11,10 @@ def create_simulation(machine_code: str) -> str:
         
     return simulation
 
-def get_cc(operation):
+def get_cc(operation: int) -> str:
+    bin_val = utils.int_to_bin(operation).zfill(16)
+    if bin_val.startswith('1'):
+        operation = utils.twos_complement_to_integer(utils.calc_twos_complement(bin_val))
     if operation > 0:
         cc = "P"
     elif operation == 0:
@@ -32,8 +35,9 @@ def simu_add(machine_state: object, bin_instruction: str) -> object:
 
     else:
         operand3 = bin_instruction[11:]
+        twos = utils.twos_complement_to_integer(operand3)
         operation = machine_state.registers[SIMU_REGISTERS_DICT[sr]] \
-                    + utils.bin_to_int(operand3)
+                    + utils.twos_complement_to_integer(operand3)
 
     machine_state.registers[SIMU_REGISTERS_DICT[dr]] = operation
     machine_state.registers['CC'] = get_cc(operation)
@@ -98,7 +102,9 @@ def simu_ld(machine_state: object, bin_instruction: str) -> object:
     dr = bin_instruction[4:7]
     offset = bin_instruction[7:]
     pc_offset_address = utils.int_to_hex(machine_state.registers['PC'] + utils.twos_complement_to_integer(offset) + 1)
-    machine_state.registers[SIMU_REGISTERS_DICT[dr]] = utils.bin_to_int(machine_state.memory_space[pc_offset_address][0])
+    value_to_load = utils.bin_to_int(machine_state.memory_space[pc_offset_address][0])
+    machine_state.registers[SIMU_REGISTERS_DICT[dr]] = value_to_load
+    machine_state.registers['CC'] = get_cc(value_to_load)
     machine_state.registers['PC'] += 1
     return machine_state
 
@@ -106,15 +112,23 @@ def simu_ldi(machine_state: object, bin_instruction: str) -> object:
     dr = bin_instruction[4:7]
     offset = bin_instruction[7:]
     pc_offset_address = machine_state.registers['PC'] + utils.twos_complement_to_integer(offset) + 1
-    machine_state.registers[SIMU_REGISTERS_DICT[dr]] = pc_offset_address
+    pointer = utils.bin_to_int(machine_state.memory_space[utils.int_to_hex(pc_offset_address)][0])
+    value_to_load = utils.bin_to_int(machine_state.memory_space[utils.int_to_hex(pointer)][0])
+    machine_state.registers[SIMU_REGISTERS_DICT[dr]] = value_to_load
+    machine_state.registers['CC'] = get_cc(value_to_load)
+    machine_state.registers['PC'] += 1
+    return machine_state
     
 def simu_ldr(machine_state: object, bin_instruction: str) -> object:
     dr = bin_instruction[4:7]
     br = bin_instruction[7:10]
     offset = bin_instruction[10:]
     
-    machine_state.registers[SIMU_REGISTERS_DICT[dr]] = machine_state.registers[SIMU_REGISTERS_DICT[br]] + utils.twos_complement_to_integer(offset)
+    address_to_look = machine_state.registers[SIMU_REGISTERS_DICT[br]] + utils.twos_complement_to_integer(offset)
+    value_to_load = utils.bin_to_int(machine_state.memory_space[utils.int_to_hex(address_to_look)][0])
+    machine_state.registers[SIMU_REGISTERS_DICT[dr]] = value_to_load
     
+    machine_state.registers['CC'] = get_cc(value_to_load)
     machine_state.registers['PC'] += 1
     return machine_state
 
@@ -122,8 +136,10 @@ def simu_lea(machine_state: object, bin_instruction: str) -> object:
     dr = bin_instruction[4:7]
     offset = bin_instruction[7:]
     
-    machine_state.registers[SIMU_REGISTERS_DICT[dr]] = machine_state.registers['PC'] + utils.bin_to_int(offset) + 1
+    pc_offset_address = machine_state.registers['PC'] + utils.twos_complement_to_integer(offset) + 1
+    machine_state.registers[SIMU_REGISTERS_DICT[dr]] = pc_offset_address
     
+    machine_state.registers['CC'] = get_cc(pc_offset_address)
     machine_state.registers['PC'] += 1
     return machine_state
 
@@ -131,8 +147,10 @@ def simu_not(machine_state: object, bin_instruction: str) -> object:
     dr = bin_instruction[4:7]
     sr = bin_instruction[7:10]
     
-    machine_state.registers[SIMU_REGISTERS_DICT[dr]] = utils.not_int(machine_state.registers[SIMU_REGISTERS_DICT[sr]])
+    operation = utils.not_int(machine_state.registers[SIMU_REGISTERS_DICT[sr]])
+    machine_state.registers[SIMU_REGISTERS_DICT[dr]] = operation
 
+    machine_state.registers['CC'] = get_cc(operation)
     machine_state.registers['PC'] += 1
     return machine_state
 
@@ -141,10 +159,12 @@ def simu_st(machine_state: object, bin_instruction: str) -> object:
     offset = bin_instruction[7:]
     
     pc_offset_val = machine_state.registers['PC'] + utils.bin_to_int(offset) + 1
-    sr_val = utils.int_to_bin(machine_state.registers[SIMU_REGISTERS_DICT[sr]]).zfill(16)
+    sr_val = utils.integer_to_twos_complement(machine_state.registers[SIMU_REGISTERS_DICT[sr]], 16)
     
-    machine_state.memory_space[utils.int_to_hex(pc_offset_val)][0] = sr_val
-    
+    try:
+        machine_state.memory_space[utils.int_to_hex(pc_offset_val)][0] = sr_val
+    except:
+        machine_state.memory_space[utils.int_to_hex(pc_offset_val)].append(sr_val)
     machine_state.registers['PC'] += 1
     return machine_state
 
@@ -152,8 +172,8 @@ def simu_sti(machine_state: object, bin_instruction: str) -> object:
     sr = bin_instruction[4:7]
     offset = bin_instruction[7:]
 
-    pc_offset_val = machine_state.registers['PC'] + utils.bin_to_int(offset) + 1
-    sr_val = utils.int_to_bin(machine_state.registers[SIMU_REGISTERS_DICT[sr]]).zfill(16)
+    pc_offset_val = machine_state.registers['PC'] + utils.twos_complement_to_integer(offset) + 1
+    sr_val = utils.integer_to_twos_complement(machine_state.registers[SIMU_REGISTERS_DICT[sr]], 16)
     
     address_to_store_in = utils.bin_to_hex(machine_state.memory_space[utils.int_to_hex(pc_offset_val)][0])
     try:
@@ -169,7 +189,7 @@ def simu_str(machine_state: object, bin_instruction: str) -> object:
     br = bin_instruction[7:10]
     offset = bin_instruction[10:]
     
-    sr_val = utils.int_to_bin(machine_state.registers[SIMU_REGISTERS_DICT[sr]]).zfill(16)
+    sr_val = utils.integer_to_twos_complement(machine_state.registers[SIMU_REGISTERS_DICT[sr]], 16)
     offset_val = utils.int_to_hex(machine_state.registers[SIMU_REGISTERS_DICT[br]] + utils.twos_complement_to_integer(offset))
     
     try:
@@ -187,7 +207,11 @@ def simu_ret(machine_state: object, bin_instruction: str) -> object:
 def simu_out_trapx21(machine_state: object, bin_instruction: str) -> object:
     r0_val = machine_state.registers['R0']
     machine_state.console_output = chr(r0_val)
+    # CC is always positive for OUT
+    machine_state.registers['CC'] = "P"
     machine_state.registers['PC'] += 1
+    # The address following the OUT instruction gets saved in R7
+    machine_state.registers['R7'] = machine_state.registers['PC']
     return machine_state
 
 def simu_halt_trapx25(machine_state: object, bin_instruction: str) -> object:
@@ -225,13 +249,21 @@ def simu_putsp_trapx24(machine_state: object, bin_instruction: str) -> object:
     machine_state.registers['PC'] += 1
     return machine_state
 
+def simu_getc_trapx20(machine_state: object, bin_instruction: str) -> object:
+    machine_state.input_mode = 1
+    return machine_state
+
+def simu_in_trapx23(machine_state: object, bin_instruction: str) -> object:
+    machine_state.input_mode = 2
+    return machine_state
+
 SIMU_FIXED_OPCODE_DICT = {
     utils.RET_BIN_STRING : simu_ret,
     utils.RTI_BIN_STRING : 'RTI',
-    utils.int_to_bin(utils.TRAPS['GETC']).zfill(16) : 'GETC',
+    "1111000000100000" : simu_getc_trapx20,
     "1111000000100001": simu_out_trapx21,
     "1111000000100010" : simu_puts_trapx22,
-    utils.int_to_bin(utils.TRAPS['IN']).zfill(16) : 'IN',
+    "1111000000100011" : simu_in_trapx23,
     "1111000000100100" : simu_putsp_trapx24,
     "1111000000100101" : simu_halt_trapx25,
 }
