@@ -67,6 +67,9 @@ class AssembleXperience(QWidget):
         self.check_for_input_timer = QTimer()
         self.check_for_input_timer.timeout.connect(self.check_for_input)
         
+        self.resume_timer = QTimer()
+        self.resume_timer.timeout.connect(self.resume_running)
+        
     def init_variables(self) -> None:
         self.registers_dict = {
             'R0' : '0',
@@ -89,6 +92,7 @@ class AssembleXperience(QWidget):
         
         self.line_timer_time = 50
         self.check_for_input_time = 10
+        self.resume_timer_time = 50
         
         self.currentState = 'simulate'
         self.editor_loaded_file = ''
@@ -192,19 +196,12 @@ class AssembleXperience(QWidget):
             self.populate_editor_file_name_display()
         
     def assemble_editor(self) -> None:
+        self.Edit_ConsoleTextBrowser.clear()
         if self.editor_loaded_file:
             assembler_return_string = LC3_Assembler.assemble(self.editor_loaded_file)
-            
-        else:
             split_path = os.path.split(self.editor_loaded_file)
             directory, asm_file_name_no_extension = split_path[0], split_path[1].split('.')[0]
-            bin_file_name = f"{asm_file_name_no_extension}.bin"
-            bin_file_path = f"{directory}\\{bin_file_name}"
-           
-            if utils.write_to_file(assembler_return_string, bin_file_path):
-                self.write_to_editor_console(f"{bin_file_path} assembled successfully!")
-            else:
-                self.write_to_editor_console(f"Error: assembly unsuccessful, could not write to {bin_file_path}.")
+            self.Edit_ConsoleTextBrowser.append(assembler_return_string)
                 
     def populate_simulator_file_name_display(self) -> None:
         self.Simulate_FileNameTextBrowser.clear()
@@ -298,7 +295,7 @@ class AssembleXperience(QWidget):
         for i in range(mem_count, mem_count + 33):
             addr_str = utils.int_to_hex(i)
             contents = self.machine_state.memory_space[addr_str]
-            if len(contents) == 2:
+            if len(contents) == 2 and contents[1] != 'x':
                 memory_space_string += f"|    {addr_str}\t{contents[0]}\t{contents[1]}\n" if i != program_counter else f"| -> {addr_str}\t{contents[0]}\t{contents[1]}\n"
             else:
                 memory_space_string += f"|    {addr_str}\t{contents[0]}\n" if i != program_counter else f"| -> {addr_str}\t{contents[0]}\n"
@@ -330,8 +327,21 @@ class AssembleXperience(QWidget):
         self.machine_state = LC3_Simulator.step_over(self.machine_state)
         self.refresh_simulation()
         
+    def resume_running(self):
+        if not self.machine_state.input_mode:
+            self.resume_timer.stop()
+            self.run()
+        
     def run(self) -> None:
-        pass
+        while self.machine_state.running and not self.machine_state.input_mode:
+            self.machine_state = LC3_Simulator.step_over(self.machine_state)
+            if not self.machine_state.input_mode:
+                self.refresh_simulation()
+            
+        if self.machine_state.input_mode:
+            self.refresh_simulation()
+            self.resume_timer.start(self.resume_timer_time)
+                
                 
 def main(): 
     app = QApplication(sys.argv)

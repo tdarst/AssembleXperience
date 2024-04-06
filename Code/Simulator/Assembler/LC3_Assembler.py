@@ -1,4 +1,3 @@
-import os, tempfile
 from ..Supporting_Libraries import asemlib, validlib, utils
 
 KEY_OPCODE = utils.KEY_OPCODE
@@ -15,13 +14,15 @@ def ready_code_for_parsing(code: str) -> str:
     code_list = code.replace("\t", " ").split("\n")
 
     # Get rid of all comments left
-    code_list_comments_removed = [line.split(";")[0].strip() 
-                                  for line in code_list 
-                                  if line.split(';')[0]]
+    code_list_comments_removed = [line.split(";")[0].rstrip()
+                                  for line in code_list]
+                                #   if line.split(';')[0]]
     
-    final_strip_pass = [x for x in code_list_comments_removed if x]
+    # final_strip_pass = [x for x in code_list_comments_removed if x]
     
-    return final_strip_pass
+    # return final_strip_pass
+    
+    return code_list_comments_removed
 
 # ==============================================================================
 # Name: check_if_solo_label
@@ -135,7 +136,6 @@ def pass1(code_to_parse: str) -> tuple[dict, dict]:
     solo_label = None
 
     for line in ready_code_for_parsing(code_to_parse):
-        line_counter += 1
         if line and not line.startswith(';'):
             # Get parts of line as a list of tokens
             tokens = generate_tokens(line)
@@ -181,7 +181,10 @@ def pass1(code_to_parse: str) -> tuple[dict, dict]:
             # Increment the address_counter
             if not is_orig:
                 address_counter += 0x1
-
+            line_counter += 1
+        else:
+            line_counter += 1
+            
     return symbol_table, label_lookup
 
 # ==============================================================================
@@ -286,6 +289,7 @@ def create_obj2_file(binary_file, asm_file, output_file):
 #          a message letting the user know.
 # ===============================================================================
 def assemble(asm_path: str) -> tuple[str, bool]:
+    
     # Assemble to binary
     if asm_path:
         file_content = utils.read_from_file(asm_path)
@@ -311,11 +315,7 @@ def assemble(asm_path: str) -> tuple[str, bool]:
             if not obj2_written:
                 pass_2_return_string = f"Error: Could not write obj2 file: {obj2_path}, assembly failed"
                 error = True
-                
-    return pass_2_return_string if error else f"{asm_path} successfully assembled as {bin_path} and {obj2_path}"
 
-        
-# For debugging
-# if __name__ == "__main__":
-#     file_path = r"C:\lc3_assembly_work\similaritytest.asm"
-#     assemble(file_path)
+    success_string = f"{asm_path} successfully assembled as {bin_path} and {obj2_path}" if not error else ""
+    
+    return pass_2_return_string if error else success_string
