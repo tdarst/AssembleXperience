@@ -211,6 +211,29 @@ QTextEdit {
       <string>OUT:</string>
      </property>
     </widget>
+    <widget class="QLabel" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>350</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Jump To:</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="Simulate_JumpToLineEdit">
+     <property name="geometry">
+      <rect>
+       <x>330</x>
+       <y>350</y>
+       <width>121</width>
+       <height>21</height>
+      </rect>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="Edit_Tab">
     <attribute name="title">
