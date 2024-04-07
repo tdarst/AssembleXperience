@@ -36,6 +36,7 @@ class AssembleXperience(QWidget):
         
         self.Simulate_SimulatorTextBrowser.installEventFilter(self)
         self.Simulate_JumpToLineEdit.installEventFilter(self)
+        self.Edit_EditorTextEditor.installEventFilter(self)
         
     def init_actions(self) -> None:
         self.populate_line_numbers()
@@ -53,6 +54,40 @@ class AssembleXperience(QWidget):
         self.Simulate_RunButton.clicked.connect(self.run)
         self.Simulate_ReinitializeButton.clicked.connect(self.reinitialize_machine)
         self.Simulate_RandomizeButton.clicked.connect(self.randomize_machine)
+        
+        self.breakpoint1.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint2.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint3.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint4.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint5.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint6.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint7.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint8.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint9.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint10.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint11.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint12.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint13.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint14.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint15.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint16.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint17.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint18.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint19.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint20.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint21.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint22.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint23.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint24.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint25.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint26.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint27.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint28.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint29.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint30.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint31.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint32.stateChanged.connect(self.breakpoint_activated)
+        self.breakpoint33.stateChanged.connect(self.breakpoint_activated)
         
     def init_timers(self) -> None:
         self.editor_line_timer = QTimer()
@@ -93,6 +128,8 @@ class AssembleXperience(QWidget):
         self.simulator_loaded_file = ''
         self.machine_state = None
         
+        self.save_needed = False
+        
         self.font_height = self.Simulate_SimulatorTextBrowser.fontMetrics().height()
         
         self.disable_buttons_during_input = [
@@ -105,18 +142,60 @@ class AssembleXperience(QWidget):
         self.mem_counter = 0
         self.lines_on_screen = 34
         
+        self.breakpoints = [
+            self.breakpoint1,
+            self.breakpoint2,
+            self.breakpoint3,
+            self.breakpoint4,
+            self.breakpoint5,
+            self.breakpoint6,
+            self.breakpoint7,
+            self.breakpoint8,
+            self.breakpoint9,
+            self.breakpoint10,
+            self.breakpoint11,
+            self.breakpoint12,
+            self.breakpoint13,
+            self.breakpoint14,
+            self.breakpoint15,
+            self.breakpoint16,
+            self.breakpoint17,
+            self.breakpoint18,
+            self.breakpoint19,
+            self.breakpoint20,
+            self.breakpoint21,
+            self.breakpoint22,
+            self.breakpoint23,
+            self.breakpoint24,
+            self.breakpoint25,
+            self.breakpoint26,
+            self.breakpoint27,
+            self.breakpoint28,
+            self.breakpoint29,
+            self.breakpoint30,
+            self.breakpoint31,
+            self.breakpoint32,
+            self.breakpoint33
+        ]
+        
     def eventFilter(self, obj: object, event) -> object:
         # Event filter to scroll through simulation address space
         if obj == self.Simulate_SimulatorTextBrowser and event.type() == event.Wheel:
-            delta = event.angleDelta().y()
-            # Stop from scrolling past min limit
-            if delta > 0 and self.mem_counter > 0:
-                self.mem_counter -= 1
-            # Stop from scrolling past max limit
-            elif self.mem_counter < utils.FOUR_DIG_HEX_MAX - self.lines_on_screen:
-                self.mem_counter += 1
-        
-            self.write_memory_space_to_simulator_window()
+            if self.machine_state:
+                delta = event.angleDelta().y()
+                # Stop from scrolling past min limit
+                if delta > 0 and self.mem_counter > 0:
+                    self.mem_counter -= 1
+                # Stop from scrolling past max limit
+                elif self.mem_counter < utils.FOUR_DIG_HEX_MAX - self.lines_on_screen:
+                    self.mem_counter += 1
+            
+                self.write_memory_space_to_simulator_window()
+            
+        if obj == self.Edit_EditorTextEditor and event.type() == QEvent.KeyPress:
+            if self.editor_loaded_file and not self.save_needed:
+                self.save_needed = True
+                self.populate_editor_file_name_display()
         
         # Even filter to search for addresses in address space using Jump To
         if obj == self.Simulate_JumpToLineEdit and event.type() == QEvent.KeyPress:
@@ -161,8 +240,12 @@ class AssembleXperience(QWidget):
     
     # Shows loaded file in editor
     def populate_editor_file_name_display(self) -> None:
+        save_needed_string = ''
+        if self.save_needed:
+            save_needed_string = '*'
+            self.save_needed = False
         self.Edit_FileNameTextBrowser.clear()
-        self.Edit_FileNameTextBrowser.append(f"Editing: {os.path.split(self.editor_loaded_file)[-1]}")
+        self.Edit_FileNameTextBrowser.append(f"Editing: {os.path.split(self.editor_loaded_file)[-1]} {save_needed_string}")
     
     # Writes string contents to editor
     def write_to_editor(self, string: str) -> None:
@@ -195,6 +278,8 @@ class AssembleXperience(QWidget):
         else:
             self.save_as_editor()
             self.populate_editor_file_name_display()
+        self.save_needed = False
+        self.populate_editor_file_name_display()
 
     # Show file save dialogue for editor
     def save_as_editor(self) -> None:
@@ -310,19 +395,26 @@ class AssembleXperience(QWidget):
         if not utils.int_to_hex(mem_count_end) in address_space:
             mem_count = utils.hex_to_int(address_space[-1]) - self.lines_on_screen
             mem_count_end = mem_count + self.lines_on_screen - 1
-        
-        # Iterates through each of the 34 addresses to display and writes their contents to screen
-        for int_address in range(mem_count, mem_count_end):
-            addr_str = utils.int_to_hex(int_address)
-            contents = self.machine_state.memory_space[addr_str]
             
-            if len(contents) == 2 and contents[1] != 'x':
-                memory_space_string += f"|    {addr_str}\t{contents[0]}\t{contents[1]}\n" if int_address != program_counter else f"| -> {addr_str}\t{contents[0]}\t{contents[1]}\n"
-            else:
-                memory_space_string += f"|    {addr_str}\t{contents[0]}\n" if int_address != program_counter else f"| -> {addr_str}\t{contents[0]}\n"
-                    
+        address_list = list(range(mem_count, mem_count_end))
+        breakpoint_status_list = []
+        
+        # Write the contents
+        for addr in address_list:
+            addr_str = utils.int_to_hex(addr)
+            contents = self.machine_state.memory_space[addr_str]
+            breakpoint_status_list.append(True) if 'b' in contents else breakpoint_status_list.append(False)
+            memory_space_string += f"|    {addr_str}\t" if addr != program_counter else f"| -> {addr_str}\t"
+            for content in contents:
+                if content != 'x' and content != 'b':
+                    memory_space_string += f"{content}\t"
+            memory_space_string += '\n'
         self.Simulate_SimulatorTextBrowser.append(memory_space_string.removesuffix('\n'))
-    
+        
+        # Set the breakpoints
+        for bp_status, breakpoint in zip(breakpoint_status_list, self.breakpoints):
+            breakpoint.setChecked(bp_status)
+            
     # Searches memory space for the address that's entered into Jump To and then goes to it if found
     def search_for_address(self) -> None:
         address = self.Simulate_JumpToLineEdit.text()
@@ -363,14 +455,43 @@ class AssembleXperience(QWidget):
     # Run through the whole program, pausing if in input mode. If input mode the launch a timer
     # to check for user input.
     def run(self) -> None:
-        while self.machine_state.running and not self.machine_state.input_mode:
+        self.machine_state.paused = False
+        while self.machine_state.running and not self.machine_state.input_mode and not self.machine_state.paused:
             self.machine_state = LC3_Simulator.step_over(self.machine_state)
+            program_counter = utils.int_to_hex(self.machine_state.registers['PC'])
+            current_instruction = self.machine_state.memory_space[program_counter]
+            if 'b' in current_instruction:
+                self.machine_state.paused = True
             if not self.machine_state.input_mode:
                 self.refresh_simulation()
+            if '0'*16 in current_instruction:
+                self.machine_state.running = False
+        
+        if self.machine_state.paused:
+            self.refresh_simulation()
             
         if self.machine_state.input_mode:
             self.refresh_simulation()
             self.resume_timer.start(self.resume_timer_time)
+    
+    # Runs if a breakpoint is checked, appends 'b' to content to signify that it should have a breakpoint attached.
+    def breakpoint_activated(self):
+        if self.simulator_loaded_file and self.machine_state.running:
+            mem_count = self.mem_counter
+            mem_count_end = mem_count + self.lines_on_screen - 1
+            
+            address_list = list(range(mem_count, mem_count_end))
+            
+            for addr, breakpoint in zip(address_list, self.breakpoints):
+                addr_str = utils.int_to_hex(addr)
+                contents = self.machine_state.memory_space[addr_str]
+                if breakpoint.isChecked():
+                    if not 'b' in contents:
+                        contents.append('b')
+                else:
+                    if 'b' in contents:
+                        contents.remove('b')
+            
                 
                 
 def main(): 

@@ -9,6 +9,7 @@ class MachineState:
         self.input_mode = 0 # input mode 0 indicates no input, 1 indicates echo (GETC), 2 indicates no echo (IN)
         self.console_output = ""
         self.running = True
+        self.paused = False
         
     def init_state(self, random: bool) -> dict:
         if random:
