@@ -230,7 +230,7 @@ def pair_instructions(bin_list, asm_list):
     obj2_string = ""
     bin_index = 0
     for asm_ins in asm_list:
-        if bin_index < len(bin_list):
+        if bin_index < len(bin_list) and not asm_ins.startswith(';'):
             if not ".STRINGZ" in asm_ins and not ".BLKW" in asm_ins:
                 obj2_string += f"{bin_list[bin_index]}:{asm_ins}\n"
                 bin_index += 1

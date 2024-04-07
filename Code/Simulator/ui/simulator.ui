@@ -112,13 +112,6 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="Simulate_ReinitializeButton">
-        <property name="text">
-         <string>Reinitialize Machine</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QPushButton" name="Simulate_RandomizeButton">
         <property name="text">
          <string>Randomize Machine</string>

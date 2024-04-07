@@ -1,11 +1,10 @@
 from ..Supporting_Libraries import simulib, utils
 
 class MachineState:
-    def __init__(self, addressed_instructions, label_lookup, random=False) -> None:
+    def __init__(self, addressed_instructions, random=False) -> None:
         self.registers = self.init_state(random)
         self.memory_space = self.init_memory_space(random)
         self.write_instructions_to_memory_space(addressed_instructions)
-        self.label_lookup = label_lookup
         self.input_mode = 0 # input mode 0 indicates no input, 1 indicates echo (GETC), 2 indicates no echo (IN)
         self.console_output = ""
         self.running = True
@@ -47,7 +46,7 @@ class MachineState:
     def init_memory_space(self, random) -> dict:
         if random:
             get_random_bin = lambda: utils.int_to_bin(utils.get_random_number(utils.FOUR_DIG_HEX_MIN, utils.FOUR_DIG_HEX_MAX))
-            memory_space = {utils.int_to_hex(key): [get_random_bin()] for key in range(0x0000, 0x8000 + 1)}
+            memory_space = {utils.int_to_hex(key): [get_random_bin().zfill(16)] for key in range(0x0000, 0x8000 + 1)}
         else:
             memory_space = {utils.int_to_hex(key): ['0'*16] for key in range(0x0000, 0x8000 + 1)}
         return memory_space
@@ -94,7 +93,6 @@ def create_simulation(obj2_file_path: str, create_with_random=False) -> MachineS
     addressed_instructions = address_instructions(binary_ins, asm_ins)
     
     machine_state = MachineState(addressed_instructions, create_with_random)
-    
     return machine_state
     
 def step_over(machine_state: MachineState) -> MachineState:

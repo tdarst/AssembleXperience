@@ -1,6 +1,7 @@
 import sys, os
-from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QTextEdit
+from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QTextEdit, QTextBrowser
 from PyQt5.QtCore import QTimer, Qt, QEvent
+from PyQt5.QtGui import QTextOption
 from PyQt5 import uic
 from asyncqt import QEventLoop, asyncSlot
 from ..Assembler import LC3_Assembler
@@ -28,12 +29,19 @@ class AssembleXperience(QWidget):
         self.show()
         
     def init_widget_settings(self) -> None:
-        # Sets text editor to side-scroll instead of wrapping text.
+        # Sets text editor and simulator to side-scroll instead of wrapping text.
         self.Edit_EditorTextEditor.setLineWrapMode(QTextEdit.NoWrap)
+        self.Simulate_SimulatorTextBrowser.setLineWrapMode(QTextBrowser.NoWrap)
+        
+        # Hide vertical scroll bar for the line number text editor
         self.Edit_LineNumberTextBrowser.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        # Hide horizontal scroll bar for the simulator text browser
+        self.Simulate_SimulatorTextBrowser.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         
+        # Set the input line edit to only take one character at a time
         self.Simulate_ConsoleLineEdit.setMaxLength(1)
-        
+
+        # Install event filter for widgets that need it.
         self.Simulate_SimulatorTextBrowser.installEventFilter(self)
         self.Simulate_JumpToLineEdit.installEventFilter(self)
         self.Edit_EditorTextEditor.installEventFilter(self)
@@ -52,8 +60,8 @@ class AssembleXperience(QWidget):
         self.Simulate_ReloadButton.clicked.connect(self.reload_simulator)
         self.Simulate_StepButton.clicked.connect(self.step_over)
         self.Simulate_RunButton.clicked.connect(self.run)
-        self.Simulate_ReinitializeButton.clicked.connect(self.reinitialize_machine)
         self.Simulate_RandomizeButton.clicked.connect(self.randomize_machine)
+        
         
         self.breakpoint1.stateChanged.connect(self.breakpoint_activated)
         self.breakpoint2.stateChanged.connect(self.breakpoint_activated)
@@ -135,7 +143,6 @@ class AssembleXperience(QWidget):
         self.disable_buttons_during_input = [
             self.Simulate_RunButton,
             self.Simulate_StepButton,
-            self.Simulate_ReinitializeButton,
             self.Simulate_RandomizeButton
         ]
         
@@ -324,11 +331,11 @@ class AssembleXperience(QWidget):
             self.populate_simulator_file_name_display()
     
     # Create the simulation based on the obj2 file that was chosen to load
-    def generate_simulation(self, obj2_file_path: str) -> None:
+    def generate_simulation(self, obj2_file_path: str, random=False) -> None:
         self.Simulate_ConsoleTextBrowser.clear()
         self.Simulate_RunButton.setEnabled(True)
         self.Simulate_StepButton.setEnabled(True)        
-        self.machine_state = LC3_Simulator.create_simulation(obj2_file_path)
+        self.machine_state = LC3_Simulator.create_simulation(obj2_file_path, random)
         self.mem_counter = self.machine_state.registers["PC"]
         self.refresh_simulation()
     
@@ -345,13 +352,13 @@ class AssembleXperience(QWidget):
     def reinitialize_machine(self):
         self.machine_state.memory_space = self.machine_state.init_memory_space(random=False)
         self.machine_state.registers = self.machine_state.init_state(random=False)
+        self.machine_state.write_instructions_to_memory_space()
         self.refresh_simulation()
     
     # Randomize all registers and addresses.
     def randomize_machine(self):
-        self.machine_state.memory_space = self.machine_state.init_memory_space(random=True)
-        self.machine_state.registers = self.machine_state.init_state(random=True)
-        self.refresh_simulation()
+        if self.simulator_loaded_file:
+            self.generate_simulation(self.simulator_loaded_file, random=True)
     
     # Rewrite all contents to the simulator windows
     def refresh_simulation(self) -> None:
