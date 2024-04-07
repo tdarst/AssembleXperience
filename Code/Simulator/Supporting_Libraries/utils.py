@@ -5,7 +5,7 @@ IMM5_INT_RANGE = range(-16, 16)
 OFFSET6_INT_RANGE = range(-32, 32)
 IMM16_INT_RANGE = range(-32768, 32768)
 FOUR_DIG_HEX_MIN = -32768
-FOUR_DIG_HEX_MAX = -32767
+FOUR_DIG_HEX_MAX = 32767
 BLKW_INT_RANGE = range(1, 501)
 STRINGZ_INT_RANGE = range(0, 501)
 
@@ -447,3 +447,6 @@ def get_obj2_path(asm_path):
 
 def get_random_number(min: int, max: int) -> int:
     return random.randint(min, max)
+
+def filter_blanks(list_of_str: list) -> list:
+    return list(filter(None, list_of_str))

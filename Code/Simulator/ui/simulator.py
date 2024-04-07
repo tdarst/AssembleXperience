@@ -121,7 +121,6 @@ class AssembleXperience(QWidget):
         # Even filter to search for addresses in address space using Jump To
         if obj == self.Simulate_JumpToLineEdit and event.type() == QEvent.KeyPress:
             if event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return:
-                print('asdf')
                 self.search_for_address()
             
         return super().eventFilter(obj, event)
@@ -310,7 +309,7 @@ class AssembleXperience(QWidget):
         # then only display the last 34 addresses.
         if not utils.int_to_hex(mem_count_end) in address_space:
             mem_count = utils.hex_to_int(address_space[-1]) - self.lines_on_screen
-            mem_count_end
+            mem_count_end = mem_count + self.lines_on_screen - 1
         
         # Iterates through each of the 34 addresses to display and writes their contents to screen
         for int_address in range(mem_count, mem_count_end):

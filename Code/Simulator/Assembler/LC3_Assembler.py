@@ -55,8 +55,14 @@ def find_opcode_in_tokens(tokens: list) -> tuple[str, int]:
 #          elements.
 # ==============================================================================
 def generate_tokens(line: str) -> list:
-    split_line = line.replace(',',' ').split(' ')
-    tokens_no_blanks = [item for item in split_line if item.strip()]
+    if not ".STRINGZ" in line.upper():
+        split_line = line.replace(',',' ').split(' ')
+        tokens_no_blanks = [item for item in split_line if item.strip()]
+    else:
+        separated_string_list = utils.filter_blanks(line.split('"'))
+        tokens_no_blanks = utils.filter_blanks(separated_string_list[0].split(" "))
+        tokens_no_blanks.append(f'"{separated_string_list[-1]}"')
+    
     return tokens_no_blanks
 
 # ==============================================================================
@@ -230,7 +236,8 @@ def pair_instructions(bin_list, asm_list):
                 bin_index += 1
             elif ".STRINGZ" in asm_ins:
                 inspect_ins = asm_ins.split(" ")
-                stringz_string = inspect_ins[-1][1:-1]
+                first_quote_index = asm_ins.index('"')
+                stringz_string = asm_ins[first_quote_index:][1:-1]
                 num_extra_blocks = len(stringz_string) + bin_index + 1
                 obj2_string += f"{bin_list[bin_index]}:{inspect_ins[0]}\n"
                 bin_index += 1
@@ -253,30 +260,53 @@ def pair_instructions(bin_list, asm_list):
 
 def create_obj2_file(binary_file, asm_file, output_file):
     success = False
-    try:
-        asm_list = []
-        bin_list = []
+    # try:
+    #     asm_list = []
+    #     bin_list = []
         
-        def clean_list(str_list: list) -> list:
-            new_str_list = [string.replace('\n', '') for string in str_list]
-            new_str_list2 = [string for string in new_str_list if string]
-            return new_str_list2
+    #     def clean_list(str_list: list) -> list:
+    #         new_str_list = [string.replace('\n', '') for string in str_list]
+    #         new_str_list2 = [string for string in new_str_list if string]
+    #         return new_str_list2
         
         
-        with open(asm_file, 'r') as asm:
-            asm_list = clean_list(asm.readlines())
-        with open(binary_file, 'r') as bin:
-            bin_list = clean_list(bin.readlines())
+    #     with open(asm_file, 'r') as asm:
+    #         asm_list = clean_list(asm.readlines())
+    #     with open(binary_file, 'r') as bin:
+    #         bin_list = clean_list(bin.readlines())
             
-        obj2_contents = pair_instructions(bin_list, asm_list)
+    #     obj2_contents = pair_instructions(bin_list, asm_list)
         
-        with open(output_file, 'w') as obj2_file:
-            obj2_file.write(obj2_contents)
+    #     with open(output_file, 'w') as obj2_file:
+    #         obj2_file.write(obj2_contents)
             
-        success = True
+    #     success = True
         
-    except Exception as e:
-        success = False
+    # except Exception as e:
+    #     success = False
+
+    asm_list = []
+    bin_list = []
+    
+    def clean_list(str_list: list) -> list:
+        new_str_list = [string.replace('\n', '') for string in str_list]
+        new_str_list2 = [string for string in new_str_list if string]
+        return new_str_list2
+    
+    
+    with open(asm_file, 'r') as asm:
+        asm_list = clean_list(asm.readlines())
+    with open(binary_file, 'r') as bin:
+        bin_list = clean_list(bin.readlines())
+        
+    obj2_contents = pair_instructions(bin_list, asm_list)
+    
+    with open(output_file, 'w') as obj2_file:
+        obj2_file.write(obj2_contents)
+        
+    success = True
+        
+
         
     return success
         
