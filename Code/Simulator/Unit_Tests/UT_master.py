@@ -188,10 +188,10 @@ def main():
     # Run the tests using TextTestRunner
     runner = unittest.TextTestRunner()
     # print("\n --- Running asemlib unit tests ---")
-    # runner.run(suite_asemlib)
+    runner.run(suite_asemlib)
     print("\n --- Running utils unit tests ---")
     runner.run(suite_utils)
     # print("\n --- Running validlib unit tests ---")
-    # runner.run(suite_validlib)
+    runner.run(suite_validlib)
     print("\n --- Running disaslib unit tests ---")
     runner.run(suite_disaslib)

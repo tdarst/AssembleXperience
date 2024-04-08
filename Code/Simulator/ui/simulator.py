@@ -35,7 +35,7 @@ class AssembleXperience(QWidget):
         
         # Hide vertical scroll bar for the line number text editor
         self.Edit_LineNumberTextBrowser.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        # Hide horizontal scroll bar for the simulator text browser
+        # Hide horizontal scroll bar for the simulator text
         self.Simulate_SimulatorTextBrowser.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         
         # Set the input line edit to only take one character at a time

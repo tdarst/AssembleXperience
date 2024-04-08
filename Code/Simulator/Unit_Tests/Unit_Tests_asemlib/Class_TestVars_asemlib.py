@@ -31,7 +31,7 @@ class TestVars():
         self.TOK_IMM5_1 = '#1'
         self.TOK_IMM5_2 = '#2'
 
-        self.TOK_STRING_ABCD = 'abcd'
+        self.TOK_STRING_ABCD = '"abcd"'
 
         self.TOK_LABEL_LOOP = 'LOOP'
         self.TOK_LABEL_NUM = 'NUM'
