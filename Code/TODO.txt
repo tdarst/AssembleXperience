@@ -1,4 +1,5 @@
 Macro Planning:
+  - Create unit tests for simulib and some utils functions that didn't get added before expo
   - Create django web application to serve AssembleXperience
     - Create UI with React to mirror or improve upon PyQt simulator design.
       - Aim to improve Text Editor with coloring for opcodes, operands, labels
@@ -8,3 +9,5 @@ Macro Planning:
   - Expand to data path simulation
 
 Bug Smashing List:
+  - Cannot reload .obj2 file while taking input.
+  - Freeze after taking input on DemoProgram2.obj2, figure out why.
