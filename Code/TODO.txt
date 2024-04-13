@@ -1,4 +1,10 @@
-Create Diagram of Library Architecture for presentation.
+Macro Planning:
+  - Create django web application to serve AssembleXperience
+    - Create UI with React to mirror or improve upon PyQt simulator design.
+      - Aim to improve Text Editor with coloring for opcodes, operands, labels
+  
+  - Add memory space components to simulate actual LC-3 chip memory space
+  - Create Disassembler
+  - Expand to data path simulation
 
--Create Simulator
--Create Disassembler
+Bug Smashing List:
