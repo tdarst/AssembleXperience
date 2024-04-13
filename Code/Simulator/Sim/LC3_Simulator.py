@@ -132,6 +132,6 @@ def run(machine_state: MachineState) -> MachineState:
             else:
                 machine_state.registers['PC'] += 1
                
-    return machine_state 
+    return machine_state
     
     
