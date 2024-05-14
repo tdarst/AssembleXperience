@@ -96,9 +96,6 @@ jobs:
           name: my-artifact
           path: Code/
 
-      - name: TempDebug
-        run: echo ${{ github.workspace }}
-
       - name: Stage
         working-directory: ${{ github.workspace }}/dist
         run: copy AssembleXperience.exe
