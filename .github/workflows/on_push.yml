@@ -96,9 +96,12 @@ jobs:
           name: my-artifact
           path: Code/
 
+      - name: TempDebug
+        run: echo "Workspace path: ${{github.workspace}}"
+
       - name: Stage
-        # working-directory: ${{ github.workspace }}
-        run: copy dist\AssembleXperience.exe
+        working-directory: ${{ github.workspace }}/dist
+        run: copy AssembleXperience.exe
 
       - name: Set Git Email
         run: git config --global user.email "trevordarst@gmail.com"
