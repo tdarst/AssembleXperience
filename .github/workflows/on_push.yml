@@ -97,7 +97,6 @@ jobs:
       - name: Stage
         working-directory: ${{ github.workspace }}
         run: |
-          echo $PWD
           copy dist\AssembleXperience.exe
 
       - name: Set Git Email
