@@ -12,6 +12,7 @@ on:
 
 jobs:
   Test_Build_Save:
+    permissions: write-all
     uses: ./.github/workflows/on_push.yml
     with:
       environment: production
@@ -23,7 +24,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
