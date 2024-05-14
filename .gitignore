@@ -1,2 +1,4 @@
 /LC3_BIN_FILES/
 __pycache__
+.vscode
+.github/workflows
