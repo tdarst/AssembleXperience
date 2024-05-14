@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
-name: Python application
+name: Push
 
 on:
   push:
@@ -13,9 +13,8 @@ permissions:
   contents: read
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
+  test:
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -23,17 +22,63 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: "3.10"
-    - name: Install dependencies
+    - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
         pip install flake8 pytest
         pip install -r Code/requirements.txt
     - name: Lint with flake8
       run: |
-        # stop the build if there are Python syntax errors or undefined names
+        # Stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
         python Code/runUnitTests.py
+
+  build:
+    needs: [test]
+    runs-on: windows-latest
+    steps:
+
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+        architecture: "x64"
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r Code/requirements.txt
+
+    - name: Compile Using PyInstaller
+      run: |
+        python -m pyinstaller --onefile --name AssembleXperience Code/runSimulator.py
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v3
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.event.head_commt.message }}
+        release_name: ${{ github.event.head_commit.message }}
+        overwrite: true
+        body: |
+          Test Release v1.0.0
+        draft: false
+        prerelease: false
+
+    - name: Upload Release
+      id: upload_release
+      uses: actions/upload-release-asset@v3
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url}}
+        asset_path: dist/AssembleXperience.exe
+        asset_name: AssembleXperience-Windows.exe
+        asset_content_type: application/zip
