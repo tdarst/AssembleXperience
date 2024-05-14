@@ -97,7 +97,7 @@ jobs:
           path: Code/
 
       - name: TempDebug
-        run: echo "Workspace path: ${{ github.workspace }}"
+        run: echo ${{ github.workspace }}
 
       - name: Stage
         working-directory: ${{ github.workspace }}/dist
