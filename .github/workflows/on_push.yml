@@ -96,7 +96,7 @@ jobs:
 
       - name: Stage
         working-directory: ${{ github.workspace }}
-        run: copy Code\dist\AssembleXperience.exe .
+        run: copy Code\AssembleXperience.exe .
 
       - name: Set Git Email
         run: git config --global user.email "trevordarst@gmail.com"
