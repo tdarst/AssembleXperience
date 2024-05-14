@@ -1,4 +1,4 @@
-# Fall Design Report Table of Contents
+# Design Report Table of Contents
 1. [Team name and Project Abstract](/Project_Planning_And_Assignments/Project_Description.md)
 2. [Test Plan and Results](/Project_Planning_And_Assignments/Test_Plan_And_Results.pdf)
 3. [User Docs](/USER_DOCS.md)
