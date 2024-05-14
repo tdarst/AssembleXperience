@@ -97,7 +97,9 @@ jobs:
           path: Code/
 
       - name: Stage
-        run: copy dist\AssembleXperience.exe
+        run: |
+          cd ..
+          copy dist\AssembleXperience.exe
 
       - name: Set Git Email
         run: git config --global user.email "trevordarst@gmail.com"
