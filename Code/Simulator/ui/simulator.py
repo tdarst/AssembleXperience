@@ -1,21 +1,21 @@
 import sys, os
-from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QTextEdit, QTextBrowser
+from PyQt5.QtWidgets import QApplication, QFileDialog, QTextEdit, QTextBrowser, QMainWindow
 from PyQt5.QtCore import QTimer, Qt, QEvent
-from PyQt5.QtGui import QTextOption
-from PyQt5 import uic
-from asyncqt import QEventLoop, asyncSlot
 from ..Assembler import LC3_Assembler
 from ..Sim import LC3_Simulator
 from ..Supporting_Libraries import utils
+from . import simulator_ui
 
-class AssembleXperience(QWidget):
+class AssembleXperience(QMainWindow):
     
     def __init__(self):
         super().__init__()
         
         path = os.path.dirname(os.path.abspath(__file__))
         # Load the UI file
-        uic.loadUi(path + "\\simulator.ui", self)
+        # uic.loadUi(path + "\\simulator.ui", self)
+        self.ui = simulator_ui.Ui_Form()
+        self.ui.setupUi(self)
         self.setWindowTitle("AssembleXperience")
         
         self.init_timers()
@@ -30,72 +30,72 @@ class AssembleXperience(QWidget):
         
     def init_widget_settings(self) -> None:
         # Sets text editor and simulator to side-scroll instead of wrapping text.
-        self.Edit_EditorTextEditor.setLineWrapMode(QTextEdit.NoWrap)
-        self.Simulate_SimulatorTextBrowser.setLineWrapMode(QTextBrowser.NoWrap)
+        self.ui.Edit_EditorTextEditor.setLineWrapMode(QTextEdit.NoWrap)
+        self.ui.Simulate_SimulatorTextBrowser.setLineWrapMode(QTextBrowser.NoWrap)
         
         # Hide vertical scroll bar for the line number text editor
-        self.Edit_LineNumberTextBrowser.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.ui.Edit_LineNumberTextBrowser.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         # Hide horizontal scroll bar for the simulator text
-        self.Simulate_SimulatorTextBrowser.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.ui.Simulate_SimulatorTextBrowser.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         
         # Set the input line edit to only take one character at a time
-        self.Simulate_ConsoleLineEdit.setMaxLength(1)
+        self.ui.Simulate_ConsoleLineEdit.setMaxLength(1)
 
         # Install event filter for widgets that need it.
-        self.Simulate_SimulatorTextBrowser.installEventFilter(self)
-        self.Simulate_JumpToLineEdit.installEventFilter(self)
-        self.Edit_EditorTextEditor.installEventFilter(self)
+        self.ui.Simulate_SimulatorTextBrowser.installEventFilter(self)
+        self.ui.Simulate_JumpToLineEdit.installEventFilter(self)
+        self.ui.Edit_EditorTextEditor.installEventFilter(self)
         
     def init_actions(self) -> None:
         self.populate_line_numbers()
         
-        self.Application_TabWidget.currentChanged.connect(self.change_state)
+        self.ui.Application_TabWidget.currentChanged.connect(self.change_state)
         
-        self.Edit_NewButton.clicked.connect(self.clear_editor)
-        self.Edit_SaveButton.clicked.connect(self.save_editor)
-        self.Edit_LoadButton.clicked.connect(self.load_editor)
-        self.Edit_AssembleButton.clicked.connect(self.assemble_editor)
+        self.ui.Edit_NewButton.clicked.connect(self.clear_editor)
+        self.ui.Edit_SaveButton.clicked.connect(self.save_editor)
+        self.ui.Edit_LoadButton.clicked.connect(self.load_editor)
+        self.ui.Edit_AssembleButton.clicked.connect(self.assemble_editor)
         
-        self.Simulate_LoadButton.clicked.connect(self.load_simulator)
-        self.Simulate_ReloadButton.clicked.connect(self.reload_simulator)
-        self.Simulate_StepButton.clicked.connect(self.step_over)
-        self.Simulate_RunButton.clicked.connect(self.run)
-        self.Simulate_RandomizeButton.clicked.connect(self.randomize_machine)
+        self.ui.Simulate_LoadButton.clicked.connect(self.load_simulator)
+        self.ui.Simulate_ReloadButton.clicked.connect(self.reload_simulator)
+        self.ui.Simulate_StepButton.clicked.connect(self.step_over)
+        self.ui.Simulate_RunButton.clicked.connect(self.run)
+        self.ui.Simulate_RandomizeButton.clicked.connect(self.randomize_machine)
         
         
-        self.breakpoint1.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint2.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint3.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint4.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint5.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint6.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint7.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint8.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint9.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint10.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint11.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint12.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint13.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint14.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint15.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint16.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint17.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint18.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint19.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint20.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint21.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint22.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint23.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint24.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint25.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint26.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint27.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint28.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint29.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint30.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint31.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint32.stateChanged.connect(self.breakpoint_activated)
-        self.breakpoint33.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint1.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint2.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint3.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint4.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint5.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint6.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint7.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint8.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint9.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint10.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint11.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint12.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint13.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint14.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint15.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint16.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint17.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint18.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint19.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint20.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint21.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint22.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint23.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint24.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint25.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint26.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint27.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint28.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint29.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint30.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint31.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint32.stateChanged.connect(self.breakpoint_activated)
+        self.ui.breakpoint33.stateChanged.connect(self.breakpoint_activated)
         
     def init_timers(self) -> None:
         self.editor_line_timer = QTimer()
@@ -138,56 +138,56 @@ class AssembleXperience(QWidget):
         
         self.save_needed = False
         
-        self.font_height = self.Simulate_SimulatorTextBrowser.fontMetrics().height()
+        self.font_height = self.ui.Simulate_SimulatorTextBrowser.fontMetrics().height()
         
         self.disable_buttons_during_input = [
-            self.Simulate_RunButton,
-            self.Simulate_StepButton,
-            self.Simulate_RandomizeButton
+            self.ui.Simulate_RunButton,
+            self.ui.Simulate_StepButton,
+            self.ui.Simulate_RandomizeButton
         ]
         
         self.mem_counter = 0
         self.lines_on_screen = 34
         
         self.breakpoints = [
-            self.breakpoint1,
-            self.breakpoint2,
-            self.breakpoint3,
-            self.breakpoint4,
-            self.breakpoint5,
-            self.breakpoint6,
-            self.breakpoint7,
-            self.breakpoint8,
-            self.breakpoint9,
-            self.breakpoint10,
-            self.breakpoint11,
-            self.breakpoint12,
-            self.breakpoint13,
-            self.breakpoint14,
-            self.breakpoint15,
-            self.breakpoint16,
-            self.breakpoint17,
-            self.breakpoint18,
-            self.breakpoint19,
-            self.breakpoint20,
-            self.breakpoint21,
-            self.breakpoint22,
-            self.breakpoint23,
-            self.breakpoint24,
-            self.breakpoint25,
-            self.breakpoint26,
-            self.breakpoint27,
-            self.breakpoint28,
-            self.breakpoint29,
-            self.breakpoint30,
-            self.breakpoint31,
-            self.breakpoint32,
-            self.breakpoint33
+            self.ui.breakpoint1,
+            self.ui.breakpoint2,
+            self.ui.breakpoint3,
+            self.ui.breakpoint4,
+            self.ui.breakpoint5,
+            self.ui.breakpoint6,
+            self.ui.breakpoint7,
+            self.ui.breakpoint8,
+            self.ui.breakpoint9,
+            self.ui.breakpoint10,
+            self.ui.breakpoint11,
+            self.ui.breakpoint12,
+            self.ui.breakpoint13,
+            self.ui.breakpoint14,
+            self.ui.breakpoint15,
+            self.ui.breakpoint16,
+            self.ui.breakpoint17,
+            self.ui.breakpoint18,
+            self.ui.breakpoint19,
+            self.ui.breakpoint20,
+            self.ui.breakpoint21,
+            self.ui.breakpoint22,
+            self.ui.breakpoint23,
+            self.ui.breakpoint24,
+            self.ui.breakpoint25,
+            self.ui.breakpoint26,
+            self.ui.breakpoint27,
+            self.ui.breakpoint28,
+            self.ui.breakpoint29,
+            self.ui.breakpoint30,
+            self.ui.breakpoint31,
+            self.ui.breakpoint32,
+            self.ui.breakpoint33
         ]
         
-    def eventFilter(self, obj: object, event) -> object:
+    def eventFilter(self, obj: object, event: QEvent) -> object:
         # Event filter to scroll through simulation address space
-        if obj == self.Simulate_SimulatorTextBrowser and event.type() == event.Wheel:
+        if obj == self.ui.Simulate_SimulatorTextBrowser and event.type() == event.Wheel:
             if self.machine_state:
                 delta = event.angleDelta().y()
                 # Stop from scrolling past min limit
@@ -199,13 +199,13 @@ class AssembleXperience(QWidget):
             
                 self.write_memory_space_to_simulator_window()
             
-        if obj == self.Edit_EditorTextEditor and event.type() == QEvent.KeyPress:
+        if obj == self.ui.Edit_EditorTextEditor and event.type() == QEvent.KeyPress:
             if self.editor_loaded_file and not self.save_needed:
                 self.save_needed = True
                 self.populate_editor_file_name_display()
         
         # Even filter to search for addresses in address space using Jump To
-        if obj == self.Simulate_JumpToLineEdit and event.type() == QEvent.KeyPress:
+        if obj == self.ui.Simulate_JumpToLineEdit and event.type() == QEvent.KeyPress:
             if event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return:
                 self.search_for_address()
             
@@ -213,13 +213,13 @@ class AssembleXperience(QWidget):
     
     # Changes certain properties depending on what tab you're on.
     def change_state(self) -> None:
-        current_index = str(self.Application_TabWidget.currentIndex())
+        current_index = str(self.ui.Application_TabWidget.currentIndex())
         self.states[current_index]()
     
     # Changes properties to what is necessary for simulate tab
     def state_simulate(self) -> None:
-        self.Simulate_ConsoleLineEdit.clear()
-        self.Simulate_ConsoleLineEdit.setReadOnly(True)
+        self.ui.Simulate_ConsoleLineEdit.clear()
+        self.ui.Simulate_ConsoleLineEdit.setReadOnly(True)
         for button in self.disable_buttons_during_input:
             button.setEnabled(True)
         self.editor_line_timer.stop()
@@ -232,18 +232,18 @@ class AssembleXperience(QWidget):
     # Changes some properties for commands like GETC and IN so char input can be taken
     # without program advancement.
     def get_input(self) -> None:
-        self.Simulate_ConsoleLineEdit.setReadOnly(False)
+        self.ui.Simulate_ConsoleLineEdit.setReadOnly(False)
         self.check_for_input_timer.start(self.check_for_input_time)
         for button in self.disable_buttons_during_input:
             button.setEnabled(False)
     
     # Adds the line numbers to the editor depending on how many lines are in it.
     def populate_line_numbers(self) -> None:
-        self.Edit_LineNumberTextBrowser.clear()
+        self.ui.Edit_LineNumberTextBrowser.clear()
         editor_contents = self.get_editor_text()
         line_number = editor_contents.count("\n") + 1
         for i in range(0, line_number):
-            self.Edit_LineNumberTextBrowser.append(f"{i+1}.")
+            self.ui.Edit_LineNumberTextBrowser.append(f"{i+1}.")
     
     # Shows loaded file in editor
     def populate_editor_file_name_display(self) -> None:
@@ -251,28 +251,28 @@ class AssembleXperience(QWidget):
         if self.save_needed:
             save_needed_string = '*'
             self.save_needed = False
-        self.Edit_FileNameTextBrowser.clear()
-        self.Edit_FileNameTextBrowser.append(f"Editing: {os.path.split(self.editor_loaded_file)[-1]} {save_needed_string}")
+        self.ui.Edit_FileNameTextBrowser.clear()
+        self.ui.Edit_FileNameTextBrowser.append(f"Editing: {os.path.split(self.editor_loaded_file)[-1]} {save_needed_string}")
     
     # Writes string contents to editor
     def write_to_editor(self, string: str) -> None:
-        self.Edit_EditorTextEditor.clear()
-        self.Edit_EditorTextEditor.append(string)
+        self.ui.Edit_EditorTextEditor.clear()
+        self.ui.Edit_EditorTextEditor.append(string)
     
     # Writes string contents to editor console
     def write_to_editor_console(self, string: str) -> None:
-        self.Edit_ConsoleTextBrowser.clear()
-        self.Edit_ConsoleTextBrowser.append(string)
+        self.ui.Edit_ConsoleTextBrowser.clear()
+        self.ui.Edit_ConsoleTextBrowser.append(string)
     
     # Clears the editor
     def clear_editor(self) -> None:
-        self.Edit_EditorTextEditor.clear()
+        self.ui.Edit_EditorTextEditor.clear()
         self.editor_loaded_file = ''
         self.populate_editor_file_name_display()
     
     # Gets the editor string contents
     def get_editor_text(self) -> str:
-        return self.Edit_EditorTextEditor.toPlainText()
+        return self.ui.Edit_EditorTextEditor.toPlainText()
     
     # Saves the contents of the editor to a file
     def save_editor(self) -> None:
@@ -308,17 +308,17 @@ class AssembleXperience(QWidget):
     
     # Assemble the file that was loaded into the editor (not the contents of the editor)
     def assemble_editor(self) -> None:
-        self.Edit_ConsoleTextBrowser.clear()
+        self.ui.Edit_ConsoleTextBrowser.clear()
         if self.editor_loaded_file:
             assembler_return_string = LC3_Assembler.assemble(self.editor_loaded_file)
             split_path = os.path.split(self.editor_loaded_file)
             directory, asm_file_name_no_extension = split_path[0], split_path[1].split('.')[0]
-            self.Edit_ConsoleTextBrowser.append(assembler_return_string)
+            self.ui.Edit_ConsoleTextBrowser.append(assembler_return_string)
     
     # Show the file that was loaded into the simulator
     def populate_simulator_file_name_display(self) -> None:
-        self.Simulate_FileNameTextBrowser.clear()
-        self.Simulate_FileNameTextBrowser.append(f"Simulating: {os.path.split(self.simulator_loaded_file)[-1]}")
+        self.ui.Simulate_FileNameTextBrowser.clear()
+        self.ui.Simulate_FileNameTextBrowser.append(f"Simulating: {os.path.split(self.simulator_loaded_file)[-1]}")
                 
     # Load a file into the simulator
     def load_simulator(self) -> None:
@@ -332,17 +332,17 @@ class AssembleXperience(QWidget):
     
     # Create the simulation based on the obj2 file that was chosen to load
     def generate_simulation(self, obj2_file_path: str, random=False) -> None:
-        self.Simulate_ConsoleTextBrowser.clear()
-        self.Simulate_RunButton.setEnabled(True)
-        self.Simulate_StepButton.setEnabled(True)        
+        self.ui.Simulate_ConsoleTextBrowser.clear()
+        self.ui.Simulate_RunButton.setEnabled(True)
+        self.ui.Simulate_StepButton.setEnabled(True)        
         self.machine_state = LC3_Simulator.create_simulation(obj2_file_path, random)
         self.mem_counter = self.machine_state.registers["PC"]
         self.refresh_simulation()
     
     # Stop the simulation
     def halt_simulation(self) -> None:
-        self.Simulate_RunButton.setEnabled(False)
-        self.Simulate_StepButton.setEnabled(False)
+        self.ui.Simulate_RunButton.setEnabled(False)
+        self.ui.Simulate_StepButton.setEnabled(False)
     
     # Restart the simulation using the obj2 file that was previously loaded 
     def reload_simulator(self) -> None:
@@ -377,7 +377,7 @@ class AssembleXperience(QWidget):
     # Check to see if the user has inputted a character
     def check_for_input(self):
         input_mode = self.machine_state.input_mode
-        input = self.Simulate_ConsoleLineEdit.text()
+        input = self.ui.Simulate_ConsoleLineEdit.text()
         if len(input) > 0:
             if input_mode == 1:
                 self.machine_state.console_output = input
@@ -390,7 +390,7 @@ class AssembleXperience(QWidget):
     
     # Write the currently selected for display contents of the memory space to the simulator window
     def write_memory_space_to_simulator_window(self) -> None:        
-        self.Simulate_SimulatorTextBrowser.clear()
+        self.ui.Simulate_SimulatorTextBrowser.clear()
         memory_space_string = ""
         program_counter = self.machine_state.registers['PC']
         mem_count = self.mem_counter
@@ -424,7 +424,7 @@ class AssembleXperience(QWidget):
             
     # Searches memory space for the address that's entered into Jump To and then goes to it if found
     def search_for_address(self) -> None:
-        address = self.Simulate_JumpToLineEdit.text()
+        address = self.ui.Simulate_JumpToLineEdit.text()
         if self.machine_state and utils.is_hex(address):
             mem_space_addresses = self.machine_state.memory_space.keys()
             if address in mem_space_addresses:
@@ -433,19 +433,19 @@ class AssembleXperience(QWidget):
     
     # Writes the contents of the machine's registers to the register window
     def write_registers_to_register_window(self) -> None:
-        self.Simulate_RegistersTextBrowser.clear()
+        self.ui.Simulate_RegistersTextBrowser.clear()
         register_string = ""
         for register, value in self.machine_state.registers.items():
             if register != "CC":
                 register_string += f"{register}\t{utils.int_to_hex(value)}\t{value}\n\n"
             else:
                 register_string += f"{register}\t{value}"
-        self.Simulate_RegistersTextBrowser.append(register_string)
-        self.Simulate_RegistersTextBrowser.verticalScrollBar().setValue(0)
+        self.ui.Simulate_RegistersTextBrowser.append(register_string)
+        self.ui.Simulate_RegistersTextBrowser.verticalScrollBar().setValue(0)
     
     # If the machine has content then writes it and clears the content
     def write_output_to_console(self) -> None:
-        self.Simulate_ConsoleTextBrowser.append(self.machine_state.console_output)
+        self.ui.Simulate_ConsoleTextBrowser.append(self.machine_state.console_output)
         self.machine_state.console_output = ""
     
     # Step over one instruction
