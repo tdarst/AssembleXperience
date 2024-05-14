@@ -16,7 +16,7 @@ class AssembleXperience(QMainWindow):
         # uic.loadUi(path + "\\simulator.ui", self)
         self.ui = simulator_ui.Ui_Form()
         self.ui.setupUi(self)
-        self.setWindowTitle("AssembleXperience")
+        self.setWindowTitle("AssembleXperience!")
         
         self.init_timers()
         self.init_widget_settings()
