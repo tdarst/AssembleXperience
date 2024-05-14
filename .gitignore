@@ -1,3 +1,4 @@
 /LC3_BIN_FILES/
 __pycache__
 .vscode
+/dist/
