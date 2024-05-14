@@ -18,7 +18,7 @@ jobs:
       environment: staging
 
   Release:
-    needs: [Test_Build_Save]
+    needs: [on_push]
     runs-on: windows-latest
 
     steps:
