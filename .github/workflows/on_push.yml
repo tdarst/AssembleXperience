@@ -82,38 +82,33 @@ jobs:
     #     draft: false
     #     prerelease: false
 
-  SaveBinary:
+  save-binary:
     needs: [build]
     permissions: write-all
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
-      - name: DownloadBinaries
+      - name: Download Binaries
         uses: actions/download-artifact@v3
         with:
           name: my-artifact
-          path: Code\
+          path: Code/
 
-    - name: stage
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: copy Code\dist\AssembleXperience.exe
+      - name: Stage
+        working-directory: ${{ github.workspace }}
+        run: copy Code\dist\AssembleXperience.exe .
 
-    - name: addEmail
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: git config --global user.email "trevordarst@gmail.com"
+      - name: Set Git Email
+        run: git config --global user.email "trevordarst@gmail.com"
 
-    - name: addName
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: git config --global user.name "trevordarst"
+      - name: Set Git Name
+        run: git config --global user.name "trevordarst"
 
-    - name: add
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: git add AssembleXperience.exe
+      - name: Add File
+        run: git add AssembleXperience.exe
 
-    - name: commit
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: git commit -m "generated"
+      - name: Commit File
+        run: git commit -m "generated"
 
-    - name: push
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: git push
+      - name: Push File
+        run: git push
