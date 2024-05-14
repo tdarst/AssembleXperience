@@ -15,7 +15,7 @@ jobs:
     permissions: write-all
     uses: ./.github/workflows/on_push.yml
     with:
-      environment: production
+      environment: staging
 
   Release:
     needs: [Test_Build_Save]
