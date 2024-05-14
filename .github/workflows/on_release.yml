@@ -11,7 +11,7 @@ on:
       - release
 
 jobs:
-  Test_Build_Save:
+  on_push:
     permissions: write-all
     uses: ./.github/workflows/on_push.yml
     with:
