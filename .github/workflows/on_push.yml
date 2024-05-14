@@ -106,7 +106,7 @@ jobs:
         run: git config --global user.name "trevordarst"
 
       - name: Add File
-        run: git add AssembleXperience.exe
+        run: git add dist\AssembleXperience.exe
 
       - name: Commit File
         run: git commit -m "generated"
