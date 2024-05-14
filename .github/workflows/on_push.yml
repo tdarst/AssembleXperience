@@ -97,7 +97,7 @@ jobs:
           path: Code/
 
       - name: Stage
-        working-directory: ${{ github.workspace }}/dist
+        working-directory: ${{ github.workspace }}\dist
         run: copy AssembleXperience.exe
 
       - name: Set Git Email
