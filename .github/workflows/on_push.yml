@@ -39,6 +39,7 @@ jobs:
 
   build:
     needs: [test]
+    permissions: write-all
     runs-on: windows-latest
     steps:
 
