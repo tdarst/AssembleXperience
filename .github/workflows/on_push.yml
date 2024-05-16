@@ -94,7 +94,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: my-artifact
-          path: Code/
+          path: dist/
 
       - name: Stage
         working-directory: ${{ github.workspace }}
