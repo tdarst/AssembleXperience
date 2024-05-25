@@ -71,19 +71,6 @@ jobs:
         path: dist\
         if-no-files-found: error
 
-    # - name: Create Release
-    #   id: create_release
-    #   uses: actions/create-release@v1
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   with:
-    #     tag_name: ${{ github.event.head_commit.message }}
-    #     release_name: ${{ github.event.head_commit.message }}
-    #     body: |
-    #       Test Release v1.0.0
-    #     draft: false
-    #     prerelease: false
-
   save-binary:
     needs: [build]
     permissions: write-all
@@ -94,11 +81,12 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: my-artifact
-          path: dist/
+          path: dist\
 
       - name: Stage
         working-directory: ${{ github.workspace }}
-        run: copy dist\AssembleXperience.exe
+        run: |
+          copy dist\AssembleXperience.exe
 
       - name: Set Git Email
         run: git config --global user.email "trevordarst@gmail.com"

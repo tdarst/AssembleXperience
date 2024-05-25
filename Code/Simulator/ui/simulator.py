@@ -16,7 +16,7 @@ class AssembleXperience(QMainWindow):
         # uic.loadUi(path + "\\simulator.ui", self)
         self.ui = simulator_ui.Ui_Form()
         self.ui.setupUi(self)
-        self.setWindowTitle("AssembleXperience")
+        self.setWindowTitle("AssembleXperience!")
         
         self.init_timers()
         self.init_widget_settings()
@@ -416,7 +416,7 @@ class AssembleXperience(QMainWindow):
                 if content != 'x' and content != 'b':
                     memory_space_string += f"{content}\t"
             memory_space_string += '\n'
-        self.Simulate_SimulatorTextBrowser.append(memory_space_string.removesuffix('\n'))
+        self.ui.Simulate_SimulatorTextBrowser.append(memory_space_string.removesuffix('\n'))
         
         # Set the breakpoints
         for bp_status, breakpoint in zip(breakpoint_status_list, self.breakpoints):
