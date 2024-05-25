@@ -5,17 +5,16 @@
 ## Building the Source Code
 - On the right side of the page you should see a release section. This section contains options for compressed source code or the exe:
 	- Executable
-		- I've automated the build process wwithin the release pipeline for the source code so that in each release there will be an available exe.
+		- I've automated the build process within the release pipeline for the source code so that in each release there will be an available exe.
 	- Building the source code:
-		1. Download the compressed source code from the release section and extract it
-		2. Install PyInstaller using: python -m pip install pyinstaller==5.13.2
-		2. Open the root directory in command line
-		3. Run the command: pyinstaller --onefile --noconsole --name AssembleXperience.exe Code\runSimulator.py
-		4. The exe should appear in the root directory.
+		- Download the compressed source code from the release section and extract it
+		- Install PyInstaller using: python -m pip install pyinstaller==5.13.2
+		- Open the root directory in command line
+		- Run the command: pyinstaller --onefile --noconsole --name AssembleXperience.exe Code\runSimulator.py
+		- The exe should appear in the root directory.
 	- Non-compressed source code:
 		- The release branch contains all of the source code for the most recent release version as well as a built executable within. You can simply
 		clone this branch if you choose to take this method.
-
 
 # Design Report Table of Contents
 1. [Team name and Project Abstract](/Project_Planning_And_Assignments/Project_Description.md)
